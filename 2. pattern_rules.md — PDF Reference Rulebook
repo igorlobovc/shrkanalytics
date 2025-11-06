@@ -1,0 +1,44 @@
+# 📘 Pattern Extraction Rules from PDF Reports
+
+## Purpose
+These rules are extracted from the visual format of the PDFs:
+- `ESTELITA - OBRAS 09-10-25 (2).pdf`
+- `ESTELITA - FONOGRAMAS -09-10-25.pdf`
+
+They define **how to segment and classify** blocks in raw tabular inputs.
+
+---
+
+## 🎯 Segmentation — Block Start Rules
+
+A new record starts when:
+
+- The line includes a **Title**, formatted as:
+  - ALL CAPS (e.g. `A DANÇA DE NICODEMOS`)
+  - Or Title Case with few punctuation marks
+- Or the line contains:
+  - ISWC: `T-XXX.XXX.XXX-X`
+  - ISRC: `BR-XXX-YY-ZZZZZ`
+
+---
+
+## 🧠 Classification Within Blocks
+
+| Field        | Pattern                                                                 |
+|--------------|-------------------------------------------------------------------------|
+| **TITLE**    | All caps or title case + near "TÍTULO PRINCIPAL DA OBRA MUSICAL"       |
+| **ARTIST**   | 2–4 capitalized words, may include connectors (de/da/do/e)             |
+| **ASSOCIATION** | Contains UBC, ABRAMUS, SOCINPRO, SBACEM                              |
+| **LABEL**    | Includes terms like `LTDA`, `EIRELI`, `EDITORA`, `PRODUÇÕES`, etc.     |
+| **CODE**     | Valid ISWC or ISRC patterns                                             |
+| **OTHER**    | Lines without match — ignored                                           |
+
+---
+
+## 🧪 Use in the Project
+
+These patterns **are not parsed live from the PDF**, but used as **reference rules** when cleaning XLSX or DuckDB content.
+
+The goal is to simulate what the PDF export was showing, using data fields (e.g., column headers like `titulo`, `autor`, `gravadora`) and format-based logic.
+
+---

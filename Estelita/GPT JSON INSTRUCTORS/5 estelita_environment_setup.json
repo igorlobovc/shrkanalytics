@@ -1,0 +1,51 @@
+{
+  "environment": {
+    "python": "/usr/local/bin/python3",
+    "venv_path": "/Users/igorcunha/SHRKVSCODE/.venv",
+    "activation_command": "source ~/SHRKVSCODE/.venv/bin/activate",
+    "required_packages": [
+      "duckdb==1.4.1",
+      "pandas",
+      "openpyxl",
+      "rapidfuzz",
+      "numpy",
+      "pyarrow"
+    ]
+  },
+  "directories": {
+    "root": "/Users/igorcunha/SHRKVSCODE/Estelita",
+    "subfolders": [
+      "Raw",
+      "Processed",
+      "pipeline",
+      "mappings",
+      "BACKUP_2025_11_06",
+      "GPT JSON INSTRUCTORS"
+    ]
+  },
+  "key_files": [
+    "coverage_report.py",
+    "script_ingest_fornecedores.py",
+    "primary_archive.duckdb",
+    "Processed/FONOGRAMAS_clean.duckdb",
+    "Processed/OBRAS_clean.duckdb",
+    "Processed/Coverage_Report.xlsx"
+  ],
+  "setup_commands": [
+    "python3 -m venv ~/SHRKVSCODE/.venv",
+    "source ~/SHRKVSCODE/.venv/bin/activate",
+    "pip install --upgrade pip",
+    "pip install duckdb pandas openpyxl rapidfuzz pyarrow",
+    "echo '✅ Environment ready for Estelita pipeline'"
+  ],
+  "validation_steps": [
+    "python -m pip show duckdb",
+    "python -c \"import duckdb, pandas; print('DuckDB + pandas ready')\"",
+    "duckdb -c 'SHOW TABLES;' /Users/igorcunha/SHRKVSCODE/Estelita/primary_archive.duckdb"
+  ],
+  "safety_guidelines": {
+    "locking": "Ensure no two DuckDB sessions open simultaneously on primary_archive.duckdb",
+    "backups": "Always run maintenance.sh to snapshot backups before large merges",
+    "file_convention": "Use YYYY_MM_DD naming for every generated dataset or report"
+  }
+}

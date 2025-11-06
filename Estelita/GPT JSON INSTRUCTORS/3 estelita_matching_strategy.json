@@ -1,0 +1,38 @@
+{
+  "matching_phases": [
+    {
+      "phase": "Exact Codes",
+      "description": "Join using ISRC (recordings) or ISWC (works). Highest precision, automatic acceptance."
+    },
+    {
+      "phase": "Title + Artist Blocking",
+      "description": "Join normalized title_base + primary_artist using strict blocking (avoid cartesian explosion)."
+    },
+    {
+      "phase": "Title + Duration ±2s",
+      "description": "Secondary join rule when audio data includes duration; ensures timing-based validation."
+    },
+    {
+      "phase": "Fuzzy Fallback (Review)",
+      "description": "RapidFuzz-based partial ratio above 90%; requires manual review before approval."
+    }
+  ],
+  "output_requirements": {
+    "relations_table": {
+      "columns": [
+        "work_id", "recording_id", "title_original", "artist_name",
+        "link_method", "confidence", "source_supplier", "source_sheet", "ref_locator"
+      ],
+      "format": "Parquet or CSV (max 50k rows per file)"
+    },
+    "coverage_report": {
+      "sheets": ["SUMMARY", "DUPLICATES", "UNMATCHED_SAMPLE"],
+      "frequency": "Run twice: now (sample) and after ingesting full historical batch"
+    }
+  },
+  "review_queue": {
+    "goal": "Generate small CSV (≤200 lines) of ambiguous matches",
+    "fields": ["title_original", "artist", "supplier", "confidence", "method"],
+    "use_case": "Manual inspection in spreadsheet"
+  }
+}

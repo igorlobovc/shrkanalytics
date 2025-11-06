@@ -1,0 +1,21 @@
+{
+  "timeline": {
+    "2025-11-05": "Initial ingestion of XLSX; header irregularities detected; partial matches attempted with poor blocking.",
+    "2025-11-06_early": "Migrated to DuckDB, fixed import sizes (OBRAS=42k, RECORDINGS=4.7k). Dropped Excel extension; used pandas + DuckDB instead.",
+    "2025-11-06_late": "Cleaned environment; deleted audit, duplicates, temporary archives; stabilized structure under Estelita directory."
+  },
+  "bottlenecks": [
+    "Irregular XLSX headers with extra rows and merged cells",
+    "Unrestricted joins creating huge cartesian sets",
+    "DuckDB Excel extension conflicts and unsigned error",
+    "Concurrent lock on .duckdb file",
+    "Common titles (e.g. 'Love', 'Amor') creating false matches"
+  ],
+  "fixes_implemented": [
+    "Standardized all imports via pandas.read_excel()",
+    "Stored clean DuckDB files in Processed/",
+    "Created backup directory for safe recovery",
+    "Removed Excel-based DuckDB extension calls"
+  ],
+  "current_state": "Stable base DB; ready to perform controlled joins by supplier for final RELATIONS generation."
+}

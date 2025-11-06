@@ -1,0 +1,23 @@
+{
+  "project_name": "Estelita Royalties Reconciliation",
+  "goal": "Consolidate and match musical works (OBRAS) and phonograms (FONOGRAMAS) from suppliers to identify unpaid or mismatched royalties, and export coverage and duplicates reports.",
+  "base_path": "/Users/igorcunha/SHRKVSCODE/Estelita",
+  "core_files": {
+    "database": "primary_archive.duckdb",
+    "scripts": ["coverage_report.py", "script_ingest_fornecedores.py"],
+    "inputs": ["Raw/ESTELITA OBRAS_v2.xlsx", "Raw/ESTELITA Fonogramas_v2.xlsx"],
+    "outputs": [
+      "Processed/Coverage_Report.xlsx",
+      "Processed/FONOGRAMAS_clean.duckdb",
+      "Processed/OBRAS_clean.duckdb"
+    ],
+    "backup": "BACKUP_2025_11_06"
+  },
+  "database_status": {
+    "OBRAS_rows": 42082,
+    "RECORDINGS_rows": 4746,
+    "coverage_percentage": 21.77,
+    "relations": "awaiting new generation"
+  },
+  "current_focus": "Generate match list (RELATIONS) with provenance from supplier and sheet, ready for coverage reporting."
+}

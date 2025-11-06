@@ -1,0 +1,33 @@
+{
+  "goal": "Regenerate supplier-based RELATIONS list, twice — first with example data, later with full historical supplier batch.",
+  "environment_prep": [
+    "Activate venv: source ~/SHRKVSCODE/.venv/bin/activate",
+    "Confirm pandas, duckdb, openpyxl installed",
+    "Ensure only one DuckDB connection open (no locks)"
+  ],
+  "run_order": [
+    {
+      "step": "1. Verify DB structure",
+      "command": "duckdb -c \"PRAGMA show_tables;\" /Users/igorcunha/SHRKVSCODE/Estelita/primary_archive.duckdb"
+    },
+    {
+      "step": "2. Generate sample relations",
+      "script": "match_sample_50_fixed.py",
+      "note": "Use controlled join by supplier; output to Processed/match_sample_50_fixed.csv"
+    },
+    {
+      "step": "3. Export coverage report",
+      "script": "coverage_report.py",
+      "note": "Ensure Excel extension NOT used; pandas ExcelWriter instead"
+    },
+    {
+      "step": "4. Validate output",
+      "criteria": "non-empty match CSV + coverage % recalculated"
+    }
+  ],
+  "second_round_plan": {
+    "inputs": "Expanded supplier set (≈5x more XLSX files in Raw/Fornecedores)",
+    "expected_variations": "Column names, formats, missing ISRC/ISWC fields",
+    "goal": "Re-run same pipeline, same logic, just extended sources"
+  }
+}

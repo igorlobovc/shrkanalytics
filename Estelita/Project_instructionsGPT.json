@@ -1,0 +1,83 @@
+{
+  "project": "Music Royalties Reconciliation for Estelita",
+  "objective": "Build a pristine Primary Archive from Estelita’s OBRAS and FONOGRAMAS spreadsheets to drive precise matching against revenue reports from broadcasters and streaming services, enabling accurate and auditable royalty reconciliation.",
+  "primary_sources": [
+    {
+      "name": "ESTELITA OBRAS (v1/v2)",
+      "description": "Excel files containing music works/obras and contributor information. Key columns include Código/ISWC, Título da obra, Autor/Compositor, Intérprete, Pseudônimo, CAE/IPI, Associação (society), flags like ORIGINAL, date fields INÍCIO/FIM, role codes, and share percentages."
+    },
+    {
+      "name": "ESTELITA FONOGRAMAS (v1/v2)",
+      "description": "Excel files listing recordings/fonogramas with metadata. Columns typically include ISRC, Título do fonograma, Intérprete/Artista principal, Participações, Álbum, Gravadora/Label, Duração, Ano and ownership fields."
+    },
+    {
+      "name": "Revenue Reports",
+      "description": "Reports from broadcasters and streaming providers (e.g., UBEM, SBT, Globo, Globoplay) containing channel, program, period, date/time of exhibition, song title, artist, duration and sometimes monetary values."
+    }
+  ],
+  "deliverables": [
+    "Primary Archive workbook with WORKS, RECORDINGS, GAZETTEER, ALIASES and RELATIONS tables",
+    "Cleaned OBRAS spreadsheet (ESTELITA_OBRAS_CLEAN.xlsx) and its bold version",
+    "Per-provider cleaned files (e.g., Globo_clean.xlsx, Globoplay_clean.xlsx)",
+    "Unified dataset (Unified_CheckBase.xlsx) merging all providers",
+    "Schema statistics (Schema_Stats.xlsx) and run logs (Run_Log.txt, Run_Summary.json)",
+    "Matches reports (e.g., Matches_Globo.xlsx) for high-confidence work↔recording links",
+    "Review queue and unknown codes lists for ambiguous or unmatched items"
+  ],
+  "processing_pipeline": [
+    "Normalize text: apply Unicode NFKD, remove diacritics, convert to lowercase, collapse whitespace and punctuation.",
+    "Extract and split title qualifiers (e.g., AO VIVO, VERSÃO, ACÚSTICO, REMIX) into a separate array while retaining a base title for matching.",
+    "Validate codes: extract ISRC/ISWC/CAE/IPI; if malformed, store them in *_raw fields.",
+    "Convert dates from dd/mm/aaaa or Excel serials to ISO YYYY-MM-DD; preserve originals in *_raw fields.",
+    "Block-list certain tokens (e.g., publisher names, broadcasters) from being interpreted as artists or titles.",
+    "Build cleaned DataFrames per source and merge duplicates by preferring codes or fuzzy title+artist/duration matches.",
+    "Use `ingest_fornecedores.py` to detect schemas, parse cue sheets and synchronization reports, output cleaned files, unify results and log pending or unrecognized files.",
+    "Use `clean_estelita.py` to clean and structure OBRAS spreadsheets, extracting code, title, date, original flag and percentage fields.",
+    "Use `search_light` module or similar to perform fuzzy matching (≤10% edit distance) on titles and names when linking works to recordings and revenue rows.",
+    "Generate per-provider summaries, schema statistics and run logs to monitor coverage and highlight missing or unknown formats."
+  ],
+  "matching_strategy": {
+    "order": ["isrc/iswc exact match", "work_code exact match", "title_base + primary_artist exact", "title_base + duration ±2s", "fuzzy review with ≤10% token edit distance"],
+    "confidence_score": "For fuzzy links, compute confidence as 1 - normalized edit distance; require ≥0.9 and additional disambiguators for common titles (e.g., amor, love, intro).",
+    "link_methods": ["isrc_match", "code_match", "title_base+artist", "title_base+duration", "manual_review"],
+    "notes": "Ambiguous matches or common titles are queued for manual review."
+  },
+  "data_normalization": {
+    "qualifiers": ["ao vivo", "versão", "acústico", "remix", "radio edit", "instrumental", "karaoke", "demo", "single", "extended", "club mix"],
+    "blocklist": ["editora", "publisher", "ubem", "ecad", "globo", "sbt", "record", "bandeirantes", "canal brasil", "programa", "emissora"],
+    "common_titles_watchlist": ["amor", "love", "noite", "tema", "intro", "sonho", "felicidade", "céu", "sol", "saudade", "thanks"],
+    "date_conversion": "Excel serials and strings are converted to ISO format; invalid dates remain in *_raw fields.",
+    "shares_raw": "Percentage/share columns are captured verbatim without interpretation."
+  },
+  "scripts_and_tools": {
+    "clean_estelita.py": "Reads the OBRAS source file, extracts code, title, holder, date, 'ORIGINAL' flag and percentage columns, drops empty rows and outputs clean and bold Excel files.",
+    "ingest_fornecedores.py": "Recursively scans per-provider directories, detects schema (UBEM_CUESHEET vs UBEM_RELATORIO), parses relevant columns, writes per-provider cleaned files, builds a unified dataset and logs pending/unrecognized files.",
+    "search_light.py": "Provides fuzzy search and matching functions with up to 10% tolerance, supporting trigram filters and edit distance per token.",
+    "match_globo.py (planned)": "Matches records from Globo_clean.xlsx against the Primary Archive recordings table, using fuzzy title/artist matching and capturing monetary values when available.",
+    "log files": ["Run_Log.txt", "Schema_Stats.xlsx", "Pending_Files.csv", "Run_Summary.json"]
+  },
+  "directory_structure": {
+    "raw_inputs": "Estelita/Raw/Fornecedores/<provider>/... contains original revenue reports and cue sheets grouped by provider",
+    "processed_outputs": "SHRKVSCODE/Processed/Cleaned_Per_Provider/<provider>_clean.xlsx stores cleaned per-provider data",
+    "unified_output": "SHRKVSCODE/Processed/Unified_CheckBase.xlsx consolidates all parsed rows",
+    "logs": "SHRKVSCODE/Processed/Logs/ holds Pending_Files.csv, Schema_Stats.xlsx, Run_Log.txt, Run_Summary.json",
+    "primary_archive": "SHRKVSCODE/primary_archive.xlsx holds WORKS, RECORDINGS, GAZETTEER, ALIASES, RELATIONS tables"
+  },
+  "providers": ["Globo", "Globoplay", "Band", "Canal Brasil", "Aparecida", "Record", "SBT", "Desconhecido (unknown schemas)"],
+  "current_status": {
+    "processed_providers": {
+      "Globo": { "files": 25, "records": 6081, "pending": 0 },
+      "Globoplay": { "files": 3, "records": 412, "pending": 0 }
+    },
+    "pending_providers": ["Aparecida", "Band", "Canal Brasil", "Record", "SBT", "Desconhecido"],
+    "pending_files_count": 19
+  },
+  "future_work": [
+    "Extend schema detection to handle new formats (e.g., TV aberta cue sheets, association reports).",
+    "Capture monetary values and durations from revenue reports; store in unified dataset for royalties calculation.",
+    "Normalize names and titles across multiple languages and transliterations.",
+    "Implement automated deduplication and merging logic for works lacking ISWC/ISRC codes.",
+    "Develop a robust matching pipeline that produces matches with confidence scores and reasons.",
+    "Provide dashboards summarizing ingestion coverage, pending files and matching success rate per provider."
+  ]
+}

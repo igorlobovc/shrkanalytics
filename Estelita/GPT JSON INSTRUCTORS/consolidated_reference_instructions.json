@@ -1,0 +1,156 @@
+{
+  "version": "1.0",
+  "role": "Consolidator",
+  "goal": "Build a pristine, deduplicated, audit-ready Consolidated Reference table from ESTELITA works (OBRAS) and recordings (FONOGRAMAS). This single reference will be used to confront all supplier searches. Do not touch suppliers now.",
+  "run_context": {
+    "env": "local_venv_only",
+    "venv_path": "/Users/igorcunha/SHRKVSCODE/.venv",
+    "python": "/usr/local/bin/python3",
+    "base_dir": "/Users/igorcunha/SHRKVSCODE/Estelita"
+  },
+  "inputs": {
+    "xlsx_raw": [
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Raw/ESTELITA OBRAS_v2.xlsx",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Raw/ESTELITA Fonogramas_v2.xlsx"
+    ],
+    "xlsx_clean_candidates": [
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/OBRAS_CLEAN.xlsx",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/FONOGRAMAS_CLEAN.xlsx",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/grouped_fonogramas.xlsx",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/OBRAS_v3_grouped.xlsx",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/FONOGRAMAS_v3_grouped.xlsx"
+    ],
+    "duckdb": {
+      "db_path": "/Users/igorcunha/SHRKVSCODE/Estelita/primary_archive.duckdb",
+      "tables_if_present": ["obras_clean", "fonogramas_clean"]
+    },
+    "pattern_reference_pdfs": [
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Raw/ESTELITA - OBRAS 09-10-25 (2).pdf",
+      "/Users/igorcunha/SHRKVSCODE/Estelita/Raw/ESTELITA - FONOGRAMAS -09-10-25.pdf"
+    ]
+  },
+  "output": {
+    "parquet": "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/Consolidated_Reference.parquet",
+    "csv": "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/Consolidated_Reference.csv",
+    "logs_dir": "/Users/igorcunha/SHRKVSCODE/Estelita/Processed/_logs",
+    "artifacts": {
+      "duplicates_csv": "Consolidated_Reference.duplicates.csv",
+      "ambiguous_csv": "Consolidated_Reference.ambiguous.csv",
+      "report_json": "Consolidated_Reference.report.json",
+      "sample_head_csv": "Consolidated_Reference.sample_head.csv"
+    }
+  },
+  "target_schema": {
+    "entity_type": "['work','recording']",
+    "work_id": "string (e.g., OBR_000001) — synthetic if missing",
+    "recording_id": "string (e.g., FON_000001) — synthetic if missing",
+    "title": "string (Title Case, canonicalized)",
+    "artist": "string (primary performer/author; choose canonical)",
+    "contributors": "array<string> (co-writers/performers if detected)",
+    "label": "string (publisher/label if present)",
+    "association": "string (UBC/ABRAMUS/SOCINPRO/SBACEM/etc.)",
+    "iswc": "string",
+    "isrc": "string",
+    "duration_seconds": "int (parse mm:ss or h:mm:ss)",
+    "situation": "string (e.g., LIBERADO/BLOQUEADA if available)",
+    "provenance": {
+      "source_file": "string",
+      "source_sheet": "string or null",
+      "source_rows": "string 'start_row-end_row' or null",
+      "source_block_id": "string (segmentation id)"
+    },
+    "confidence": "float [0..1] (internal scoring for canonical choice)",
+    "notes": "string (optional)"
+  },
+  "normalization": {
+    "text": [
+      "strip whitespace",
+      "normalize unicode (NFKD) + remove diacritics",
+      "collapse multiple spaces",
+      "unify quotes and dashes",
+      "lowercase for comparison, Title Case for display fields (title, artist)"
+    ],
+    "columns_map": {
+      "title_variants": ["titulo", "título", "titulo_da_obra", "título_principal_da_obra_musical", "titulo_do_fonograma"],
+      "artist_variants": ["autor", "compositor", "interprete", "artista", "autor/compositor"],
+      "label_variants": ["gravadora", "label", "editora", "produtora", "producoes", "produções"],
+      "association_variants": ["associacao", "associação", "sociedade"],
+      "iswc_variants": ["iswc"],
+      "isrc_variants": ["isrc", "isrc/gra"],
+      "duration_variants": ["duracao", "duração"],
+      "situation_variants": ["situacao", "situação"]
+    },
+    "duration_parse_rules": [
+      "if matches ^\\d{1,2}:\\d{2}$ → mm:ss",
+      "if matches ^\\d{1}:\\d{2}:\\d{2}$ → h:mm:ss",
+      "coerce to seconds; invalid → null"
+    ]
+  },
+  "segmentation_rules": {
+    "use_pdf_patterns_as_reference_only": true,
+    "block_start": [
+      "line classified as TITLE (all caps OR title-case and no punct heavy)",
+      "OR presence of ISRC (^[A-Z]{2}-[A-Z0-9]{3}-\\d{2}-\\d{5}$) OR ISWC (T-\\d{3}\\.\\d{3}\\.\\d{3}-\\d)"
+    ],
+    "within_block_classification": {
+      "TITLE": "all caps or title-case title-like line; often near 'TÍTULO PRINCIPAL DA OBRA MUSICAL'",
+      "ARTIST": "2–4 capitalized tokens with optional connectors (de/da/do/dos/e)",
+      "ASSOCIATION": "contains UBC|ABRAMUS|SOCINPRO|SBACEM|ASSOCIACAO",
+      "LABEL": "contains LTDA|EIRELI|EDITORA|PRODUCOES|PRODUÇÕES|GRAVADORA",
+      "CODE": "ISRC/ISWC regex matches",
+      "OTHER": "ignore for canonical fields"
+    },
+    "emit_one_row_per_block": true,
+    "generate_ids": {
+      "work_id": "OBR_{auto:06d} for blocks derived from OBRAS",
+      "recording_id": "FON_{auto:06d} for blocks derived from FONOGRAMAS"
+    }
+  },
+  "merge_and_canonicalization": {
+    "purpose": "Unify OBRAS and FONOGRAMAS into one table with consistent columns.",
+    "merge_keys_priority": [
+      "1) ISWC ↔ ISWC",
+      "2) ISRC ↔ ISRC",
+      "3) normalized(title) + normalized(artist)"
+    ],
+    "canonical_title_choice": [
+      "prefer the variant with ISWC present",
+      "else prefer the longest title without stopwords duplication",
+      "else prefer OBRAS title over FONOGRAMAS"
+    ],
+    "canonical_artist_choice": [
+      "prefer performer (FONOGRAMAS) if present",
+      "else prefer author/composer (OBRAS)",
+      "else most frequent variant across sources"
+    ],
+    "collapse_duplicates": {
+      "hard_duplicates": "same normalized(title)+artist or same code; keep one",
+      "soft_duplicates": "token_sort_ratio >= 95 on title; pick canonical, store alternates in 'notes'"
+    }
+  },
+  "quality_checks": [
+    "assert row_count > 0",
+    "no more than 2% nulls in 'title'",
+    "distinct(isrc) + distinct(iswc) reported",
+    "duplicate groups summary (by canonical title, by codes)",
+    "write top 20 ambiguous decisions to artifacts/ambiguous_csv"
+  },
+  "constraints": [
+    "Run locally inside the given .venv. Do not use Kaggle. Do not use Excel DuckDB plugin.",
+    "Idempotent: running twice must not duplicate rows.",
+    "Do not modify original source files."
+  },
+  "deliverables": [
+    "Consolidated_Reference.parquet",
+    "Consolidated_Reference.csv",
+    "_logs/Consolidated_Reference.report.json",
+    "_logs/Consolidated_Reference.duplicates.csv",
+    "_logs/Consolidated_Reference.ambiguous.csv",
+    "_logs/Consolidated_Reference.sample_head.csv"
+  ],
+  "agent_guidance": {
+    "recommended": "Tool-using Agent (Python + pandas + pyarrow + rapidfuzz + unidecode + duckdb)",
+    "acceptable": "Codex-style one-shot script generation, then run locally in .venv",
+    "avoid": ["Excel DuckDB extension"]
+  }
+}

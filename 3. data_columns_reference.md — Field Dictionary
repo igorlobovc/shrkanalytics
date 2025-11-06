@@ -1,0 +1,42 @@
+# 📊 Estelita Data Column Map
+
+## 🎼 Works (OBRAS)
+Typically contains:
+- `titulo`, `titulo_da_obra`, `titulo_principal_da_obra_musical`
+- `autor`, `compositor`, `sociedade`, `iswc`
+- `situacao`, `gravadora`, `editora`
+
+## 📀 Recordings (FONOGRAMAS)
+Typically contains:
+- `titulo_do_fonograma`, `interprete`, `isrc`, `gravadora`, `label`, `associação`
+- Duration fields: `duracao` or `duração`
+- Contributor fields: `autor/compositor`, secondary performers
+
+---
+
+## 🧼 Normalization Steps
+
+1. Lowercase → normalize unicode → remove diacritics
+2. Collapse multiple spaces
+3. Title case for `title`, `artist`
+4. Parse `duracao` fields (mm:ss or h:mm:ss) into `duration_seconds`
+5. Match and deduplicate by:
+   - Exact ISWC/ISRC
+   - Fuzzy token sort ratio >= 95 for title+artist
+
+---
+
+## 🆔 ID Generation
+
+If missing:
+- `work_id`: `OBR_000001`, `OBR_000002`, …
+- `recording_id`: `FON_000001`, `FON_000002`, …
+
+Each is tied to a `provenance` block:
+```json
+{
+  "source_file": "ESTELITA Fonogramas_v2.xlsx",
+  "source_sheet": null,
+  "source_rows": "155-160",
+  "source_block_id": "FON_000342"
+}

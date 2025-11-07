@@ -186,8 +186,10 @@ def to_cents_series(series: 'pd.Series') -> 'pd.Series':
 
 
 def classify_values_from_workbook(xlsx: Path, provider: str):
-    explicit_out = []
-    alias_out = []
+    explicit_with = []
+    alias_with = []
+    explicit_no = []
+    alias_no = []
     try:
         xl = pd.ExcelFile(xlsx)
     except Exception:
@@ -202,36 +204,61 @@ def classify_values_from_workbook(xlsx: Path, provider: str):
         # Identify columns
         col_unc = find_col(df, ['Uncertain Match','uncertain_match'])
         col_basis = find_col(df, ['Eligibility Basis','eligibility basis'])
-        col_amt = find_col(df, ['Valor (BRL)','VALOR A PAGAR - EDITORA'])
+        col_amt = find_col(df, ['VALOR A PAGAR - EDITORA','Valor (BRL)'])
         if col_amt is None:
-            continue
-        # Build amount_cents
+            # Fallback: take the last column if present
+            if df.shape[1] >= 1:
+                col_amt = df.columns[-1]
+            else:
+                # no columns at all
+                continue
+        # Build amount_cents (default to 0 if conversion fails)
         if str(col_amt).strip().lower() == 'valor (brl)':
             cents = (pd.to_numeric(df[col_amt], errors='coerce').fillna(0.0)*100).round().astype(int)
         else:
             cents = to_cents_series(df[col_amt])
-        # Determine uncertainty
-        if col_unc and col_unc in df.columns:
-            unc = df[col_unc].astype(str).str.strip().str.lower().map(lambda x: True if x=='true' else (False if x=='false' else True))
-        else:
-            if col_basis and col_basis in df.columns:
-                unc = df[col_basis].astype(str).str.contains('artist_alias|editora_alias', case=False, na=False)
-            else:
-                unc = pd.Series([True]*len(df))
+        # Determine class by sheet name preference (align with user's expectation)
+        sname = str(sheet).strip().lower()
+        is_explicit_sheet = sname == 'explicit_refs_only'
+        is_alias_sheet = ('low probability' in sname) or ('alias' in sname)
         # Select useful columns
         keep_cols = [c for c in ['EDITORA','PROGRAMA','NÚMERO PROGRAMA','EXIBIÇÃO (GRAVADO OU REPRISE)','CATEGORIA DO PROGRAMA (PROGRAMA, NOVELA)','DATA DE EXIBIÇÃO','NOME DA MÚSICA','AUTOR','INTERPRETE','PERCENTUAL A PAGAR - EDITORA',col_amt] if c in df.columns]
         sub = df[keep_cols].copy()
         sub.insert(0, 'file_stem', xlsx.stem.replace('__eligible_with_refs',''))
         sub.insert(0, 'provider', provider)
         sub['amount_cents'] = cents
-        # explicit: uncertain == False
-        e = sub[(sub['amount_cents']>0) & (~unc)]
-        a = sub[(sub['amount_cents']>0) & (unc)]
-        if not e.empty:
-            explicit_out.append(e)
-        if not a.empty:
-            alias_out.append(a)
-    return explicit_out, alias_out
+        sub['amount_int'] = (sub['amount_cents'].astype(int)/100.0).round().astype(int)
+        # Classify rows by sheet first; if neither, fall back to uncertainty
+        if is_explicit_sheet:
+            e_with = sub[(sub['amount_cents']>0)]
+            e_no = sub[(sub['amount_cents']<=0)]
+            a_with = sub.iloc[0:0]
+            a_no = sub.iloc[0:0]
+        elif is_alias_sheet:
+            a_with = sub[(sub['amount_cents']>0)]
+            a_no = sub[(sub['amount_cents']<=0)]
+            e_with = sub.iloc[0:0]
+            e_no = sub.iloc[0:0]
+        else:
+            if col_unc and col_unc in df.columns:
+                unc = df[col_unc].astype(str).str.strip().str.lower().map(lambda x: True if x=='true' else (False if x=='false' else True))
+            elif col_basis and col_basis in df.columns:
+                unc = df[col_basis].astype(str).str.contains('artist_alias|editora_alias', case=False, na=False)
+            else:
+                unc = pd.Series([True]*len(df))
+            e_with = sub[(sub['amount_cents']>0) & (~unc)]
+            a_with = sub[(sub['amount_cents']>0) & (unc)]
+            e_no = sub[(sub['amount_cents']<=0) & (~unc)]
+            a_no = sub[(sub['amount_cents']<=0) & (unc)]
+        if not e_with.empty:
+            explicit_with.append(e_with)
+        if not a_with.empty:
+            alias_with.append(a_with)
+        if not e_no.empty:
+            explicit_no.append(e_no)
+        if not a_no.empty:
+            alias_no.append(a_no)
+    return explicit_with, alias_with, explicit_no, alias_no
 
 
 def write_values_csv(path: Path, frames: list['pd.DataFrame']):
@@ -243,7 +270,7 @@ def write_values_csv(path: Path, frames: list['pd.DataFrame']):
                 pass
         return
     df = pd.concat(frames, ignore_index=True)
-    if 'amount_cents' in df.columns:
+    if 'amount_cents' in df.columns and 'amount_numeric' not in df.columns:
         df['amount_numeric'] = (df['amount_cents'].astype(int)/100.0).map(lambda v: f"{v:.2f}")
     cols = ['provider','file_stem'] + [c for c in df.columns if c not in {'provider','file_stem'}]
     df[cols].to_csv(path, index=False)
@@ -314,18 +341,28 @@ def write_alias_values_csv(alias_rows):
 
 def main():
     stem_to_provider = build_stem_provider_map()
-    exp_frames = []
-    ali_frames = []
+    exp_with = []
+    ali_with = []
+    exp_no = []
+    ali_no = []
     for xlsx in PROC.glob('*__eligible_with_refs.xlsx'):
         stem = xlsx.stem.replace('__eligible_with_refs', '')
         provider = stem_to_provider.get(stem, '')
-        e, a = classify_values_from_workbook(xlsx, provider)
-        if e:
-            exp_frames.extend(e)
-        if a:
-            ali_frames.extend(a)
-    write_values_csv(PROC / 'Eligible_Value_Explicit_All_Providers.csv', exp_frames)
-    write_values_csv(PROC / 'Eligible_Value_Alias_All_Providers.csv', ali_frames)
+        e_w, a_w, e_n, a_n = classify_values_from_workbook(xlsx, provider)
+        if e_w:
+            exp_with.extend(e_w)
+        if a_w:
+            ali_with.extend(a_w)
+        if e_n:
+            exp_no.extend(e_n)
+        if a_n:
+            ali_no.extend(a_n)
+    # With value
+    write_values_csv(PROC / 'Eligible_Value_Explicit_All_Providers.csv', exp_with)
+    write_values_csv(PROC / 'Eligible_Value_Alias_All_Providers.csv', ali_with)
+    # Without value
+    write_values_csv(PROC / 'Explicit_Without_Value_All_Providers.csv', exp_no)
+    write_values_csv(PROC / 'Alias_Without_Value_All_Providers.csv', ali_no)
 
 if __name__ == '__main__':
     main()

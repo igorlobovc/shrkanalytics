@@ -58,12 +58,17 @@ This repo now includes a focused pipeline to match supplier sheets and prioritiz
 - In‑DB matcher (DuckDB):
   - `Estelita/build_relations_duckdb.py` — detect columns by overlap, join WORKS ↔ RECORDINGS and profile inputs
 
-### SBT Deliverable (checked into Git)
+### SBT Deliverables (checked into Git)
 
 - `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx`
-  - This is the SBT “matches‑only” workbook with two extra columns added per row:
-    - `Matched Title`
-    - `Matched Identifier/ISWC`
+  - SBT “matches‑only” workbook with reference columns:
+    - `Matched Title`, `Matched Identifier/ISWC`
+- `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx`
+  - SBT “rights‑eligible” workbook (two tabs):
+    - `Explicit_Refs_Only`: rows that intersect Estelita catalog by title and/or ISWC
+    - `Artist_Alias_Eligible`: rows eligible by represented artist or editora alias
+  - All rows include:
+    - `Matched Title`, `Matched Identifier/ISWC`, `Eligibility Basis`, `Uncertain Match`
 
 ### How to Reproduce Locally
 
@@ -98,3 +103,15 @@ Outputs are written to `Estelita/Processed/`.
 
 - The `.gitignore` allows committing the SBT deliverable workbook mentioned above so it’s accessible on GitHub.
 - Other large files (e.g., full `Processed/` outputs) are generated locally and typically not tracked, to keep the repo light.
+5) Build eligibility catalog and export SBT “rights‑eligible” workbook (two tabs):
+
+```
+python3 Estelita/build_eligible_catalog.py
+SUPPLIER_FILE="/Users/…/Fornecedores/SBT/Unificado SBT nov dez 23 e jan fev mar 24.xls" \
+  python3 Estelita/export_sbt_rights_eligible.py
+```
+
+Outputs:
+- `Estelita/Processed/Eligible_Catalog.csv`, `Eligible_Artists.txt`
+- `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx`
+- `Estelita/Processed/SBT_Rights_Eligible_Summary.csv`

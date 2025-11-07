@@ -7,6 +7,7 @@ __pycache__/
 *.xlsb
 # Allow committing the prioritized SBT matches workbook
 !Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx
+!Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx
 # Do not track very large generated CSVs
 Estelita/Processed/RELATIONS_AUTO.csv
 Estelita/Processed/match_sample_50_fixed.csv

@@ -152,11 +152,11 @@ def main():
             eligible_artists = set(x.strip().lower() for x in ELIGIBLE_ARTISTS.read_text(encoding='utf-8').splitlines() if x.strip())
         except Exception:
             pass
-    estelita_aliases = {'estelita'}
+    estelita_aliases = {'estelita', 'eduardo melo pereira', 'eduardo melo pereira ltda'}
 
     # Read the supplier workbook and filter/enrich per sheet
     xl = pd.ExcelFile(xl_path)
-    kept = {}
+    rows_all = []
     total_amount = 0.0
     for sheet in xl.sheet_names:
         df = xl.parse(sheet)
@@ -199,37 +199,91 @@ def main():
             editora_norm = norm_series(work[c_editora])
             has_alias = editora_norm.apply(lambda x: any(a in x for a in estelita_aliases))
             eligible_mask = eligible_mask | has_alias
-        # Filter to eligible
-        eligible_df = work[eligible_mask].copy()
+        # Compose eligibility basis
+        basis = []
+        basis.append(('title_in_catalog', work['__title_norm'].isin(eligible_titles)))
+        if 'Matched Identifier/ISWC' in work.columns:
+            basis.append(('iswc_in_catalog', work['Matched Identifier/ISWC'].astype(str).isin(eligible_iswcs)))
+        artist_norm = norm_series(work[c_artist]) if c_artist and c_artist in work.columns else pd.Series(['']*len(work))
+        basis.append(('artist_alias', artist_norm.isin(eligible_artists) if len(artist_norm) else pd.Series([False]*len(work))))
+        if c_editora and c_editora in work.columns:
+            editora_norm = norm_series(work[c_editora])
+            basis.append(('editora_alias', editora_norm.apply(lambda x: any(a in x for a in estelita_aliases))))
+        # Build basis string per row
+        basis_df = pd.DataFrame({name: mask for name, mask in basis})
+        work['Eligibility Basis'] = basis_df.apply(lambda r: '+'.join([k for k,v in r.items() if v]), axis=1)
+        # Eligible if any basis present
+        eligible_df = work[(basis_df.any(axis=1))].copy()
         if eligible_df.empty:
             continue
-        # Sum monetary amounts if present
+        # Sum monetary amounts if present (define local parser here to avoid scope issues)
         if c_valor and c_valor in eligible_df.columns:
-            eligible_df['__valor_float'] = eligible_df[c_valor].apply(parse_brl)
+            def _parse_brl(v):
+                s = str(v or '').strip().replace('R$','').replace(' ','')
+                s = s.replace('.', '').replace(',', '.')
+                try:
+                    return float(s)
+                except Exception:
+                    return 0.0
+            eligible_df['__valor_float'] = eligible_df[c_valor].apply(_parse_brl)
             total_amount += float(eligible_df['__valor_float'].sum())
             eligible_df = eligible_df.drop(columns=['__valor_float'])
-        # Drop helpers
-        drop_cols = [c for c in eligible_df.columns if c.startswith('title_norm') or c in ('author_norm','title_ref','author','title_norm_titleonly','title_ref_titleonly','author_titleonly','uncertain_match_titleonly','__title_norm','__author_norm','title_norm_titleonly')]
-        eligible_df = eligible_df.drop(columns=drop_cols, errors='ignore')
-        kept[sheet] = eligible_df
+        eligible_df['__source_sheet'] = sheet
+        rows_all.append(eligible_df)
 
-    # Write workbook
-    if not kept:
+    if not rows_all:
         print('No eligible matches found to export.')
         return
+    full = pd.concat(rows_all, ignore_index=True)
+    # Split into two tabs
+    explicit_mask = (full['Matched Title'].astype(str).str.strip()!='') | (full['Matched Identifier/ISWC'].astype(str).str.strip()!='')
+    explicit = full[explicit_mask].copy()
+    alias_only = full[~explicit_mask].copy()
+
+    # Keep useful columns and drop helpers
+    def cleanup(df):
+        drop_cols = [c for c in df.columns if c.startswith('title_norm') or c in ('author_norm','title_ref','author','title_norm_titleonly','title_ref_titleonly','author_titleonly','uncertain_match_titleonly','__title_norm','__author_norm','title_norm_titleonly')]
+        return df.drop(columns=drop_cols, errors='ignore')
+    explicit = cleanup(explicit)
+    alias_only = cleanup(alias_only)
+
     out_xlsx = OUT_DIR / (xl_path.stem + '__eligible_with_refs.xlsx')
     with pd.ExcelWriter(out_xlsx) as wr:
-        for name, fdf in kept.items():
-            fdf.to_excel(wr, sheet_name=name[:31] or 'Sheet1', index=False)
+        explicit.to_excel(wr, sheet_name='Explicit_Refs_Only', index=False)
+        alias_only.to_excel(wr, sheet_name='Artist_Alias_Eligible', index=False)
     print(f'Saved eligible workbook: {out_xlsx}')
 
     # Summary CSV
     summary = pd.DataFrame([
-        {'file': xl_path.name, 'eligible_sheets': len(kept), 'sum_valor_editora_brl': round(total_amount, 2)}
+        {'file': xl_path.name,
+         'eligible_rows_total': len(full),
+         'explicit_rows': len(explicit),
+         'alias_only_rows': len(alias_only),
+         'sum_valor_editora_brl': round(total_amount, 2)}
     ])
     out_sum = OUT_DIR / 'SBT_Rights_Eligible_Summary.csv'
     summary.to_csv(out_sum, index=False)
     print(f'Summary saved: {out_sum}')
+
+    # Print counts and top-20 explicit by amount
+    def parse_brl(value: str) -> float:
+        s = str(value or '').strip().replace('R$','').replace(' ','')
+        s = s.replace('.', '').replace(',', '.')
+        try:
+            return float(s)
+        except Exception:
+            return 0.0
+    amt_col = next((c for c in explicit.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
+    if amt_col:
+        explicit['__amount'] = explicit[amt_col].apply(parse_brl)
+        explicit_sorted = explicit.sort_values('__amount', ascending=False)
+        cols_show = [c for c in ['DATA DE EXIBIÇÃO','PROGRAMA','EDITORA','NOME DA MÚSICA','INTERPRETE','PERCENTUAL A PAGAR - EDITORA',amt_col,'Matched Title','Matched Identifier/ISWC','Eligibility Basis'] if c in explicit_sorted.columns]
+        print('EXPLICIT_COUNTS', len(explicit_sorted))
+        print('EXPLICIT_TOP20_START')
+        for _, r in explicit_sorted.head(20).iterrows():
+            parts = [f"{c}: {r.get(c,'')}" for c in cols_show]
+            print(' - ' + ' | '.join(parts))
+        print('EXPLICIT_TOP20_END')
 
 if __name__ == '__main__':
     main()

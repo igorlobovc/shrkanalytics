@@ -210,3 +210,18 @@ Outputs:
 
 - Reproducibility
   - After changes, run `python3 Estelita/run_full_pipeline.py` and commit updated summary CSVs and README notes.
+
+## 📈 Highlight Findings (current run)
+
+- Searches
+  - Sheets scanned: 56
+  - Rows scanned: 130,788
+- Matches found (sheet-based)
+  - Explicit total rows: 60
+  - Low probability (alias) total rows: 1,135
+- Fornecedor coverage
+  - Files scanned: 49
+  - Files with ≥1 match: 18
+  - Match rate (files): 36.73%
+
+Sources: `Supplier_Search_Coverage.csv`, rollup CSVs in `Processed/`, and `Supplier_Matches_All.csv`.

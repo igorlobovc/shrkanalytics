@@ -213,8 +213,10 @@ def main():
                  open(explicit_out, 'w', encoding='utf-8', newline='') as outf:
                 rin = csv.DictReader(inf)
                 cols = rin.fieldnames or []
-                # Keep a useful subset + numeric amount
-                keep = ['provider','file_stem'] + [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'}]
+                # Keep a useful subset + numeric amount; avoid duplicates
+                base_keep = ['provider','file_stem']
+                rest = [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'} and c not in base_keep]
+                keep = base_keep + rest
                 w = csv.DictWriter(outf, fieldnames=keep + ['amount_numeric'])
                 w.writeheader()
                 for row in rin:

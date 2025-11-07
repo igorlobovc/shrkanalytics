@@ -138,3 +138,39 @@ Outputs:
 - Unified summary: `Estelita/Processed/Summaries/Unified_Explicit_Summary.csv`
   - Columns: `file_stem`, `explicit_rows`, `explicit_with_value_rows`, `unified_lastcol_amount_rows`
   - `explicit_*` are taken from processed `__eligible_with_refs.xlsx` (Explicit_Refs_Only). `unified_lastcol_amount_rows` scans the original unified workbook to detect the best amount column (by name or currency-like values) and counts rows with positive amounts.
+
+## 🚀 Running the Full Pipeline
+
+- End-to-end run across Raw/Fornecedores and Raw/Unified:
+
+```
+python3 Estelita/run_full_pipeline.py
+```
+
+This performs:
+- Build searchable base (titles, authors, ISWC/ISRC, aliases)
+- Batch matches (Fornecedores + Unified) and merge
+- Export eligible workbooks for each supplier file
+- Rebuild sheet-based rollups (with/without value)
+- Rebuild fornecedores summaries and unified summaries
+
+Notes:
+- Amounts are normalized to integer cents; integer BRL is used for totals.
+- Explicit vs Alias classification follows sheet names: `Explicit_Refs_Only` vs sheets containing `Low Probability`/`Alias`.
+
+## 🧭 Git Protocols
+
+- Tracked inputs
+  - Keep unified inputs under version control: `Estelita/Raw/Unified/*.xlsx` (allowed via .gitignore exception).
+  - Do not track vendor raw directories other than Unified (they can be large/volatile).
+
+- Generated artifacts
+  - Commit scripts and summary CSVs under `Estelita/Processed/Summaries/`.
+  - Large, per-file generated CSVs are generally not tracked unless whitelisted.
+
+- Branching
+  - Use a feature branch for data/modeling changes (e.g., `finance-pack-and-summaries`).
+  - Include concise commit messages: scope, action, and impact on outputs.
+
+- Reproducibility
+  - After changes, run `python3 Estelita/run_full_pipeline.py` and commit updated summary CSVs and README notes.

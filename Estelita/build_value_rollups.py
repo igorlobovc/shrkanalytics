@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 Build consolidated CSVs of provider rows that have monetary values:
-- Eligible_Value_Explicit_All_Providers.csv: rows from Explicit_Refs_Only with Valor (BRL) > 0
-- Eligible_Value_Alias_All_Providers.csv: rows from Low Probability (alias) with Valor (BRL) > 0
+- Eligible_Value_Explicit_All_Providers.csv: rows from Explicit_Refs_Only with amount > 0
+- Eligible_Value_Alias_All_Providers.csv: rows from Low Probability (alias) with amount > 0
 
-Relies on eligible workbooks produced by export_sbt_rights_eligible.py, which add
-numeric 'Valor (BRL)' columns when amounts exist, and falls back to parsing
-"VALOR A PAGAR - EDITORA" if needed.
+Fast path: If Eligible_Explicit_All_Providers.csv exists, filter it by
+VALOR A PAGAR - EDITORA > 0 to produce explicit values, avoiding XLSX parsing.
+Fallback: parse eligible_with_refs.xlsx files directly.
 """
 
 from pathlib import Path
@@ -137,15 +137,30 @@ def read_sheet_rows(z: zipfile.ZipFile, sheet_path: str, sst: list[list[str]]):
         data.append(values)
     return header_list, data
 
-def main():
-    # Build stem->provider map
+def build_stem_provider_map():
     stem_to_provider = {}
     for p in FORN_ROOT.rglob('*'):
         if p.is_file() and p.suffix.lower() in ('.xlsx', '.xls'):
             stem_to_provider[p.stem] = p.parent.name
+    # Also consult matches file if present (more robust)
+    matches_csv = PROC / 'Supplier_Matches_All.csv'
+    if matches_csv.exists():
+        try:
+            with open(matches_csv, 'r', encoding='utf-8', newline='') as f:
+                r = csv.DictReader(f)
+                for row in r:
+                    fn = str(row.get('file') or '')
+                    prov = str(row.get('provider') or '')
+                    st = Path(fn).stem if fn else ''
+                    if st and prov:
+                        stem_to_provider[st] = prov
+        except Exception:
+            pass
+    return stem_to_provider
 
-    explicit_rows = []
-    alias_rows = []
+
+def write_alias_values_from_xlsx(stem_to_provider, alias_rows):
+    # Scan eligible workbooks for alias values
     for xlsx in PROC.glob('*__eligible_with_refs.xlsx'):
         stem = xlsx.stem.replace('__eligible_with_refs', '')
         provider = stem_to_provider.get(stem, '')
@@ -153,26 +168,6 @@ def main():
             with zipfile.ZipFile(xlsx, 'r') as z:
                 sst = load_shared_strings(z)
                 name_map = get_sheets_map(z)
-                # read explicit
-                if 'Explicit_Refs_Only' in name_map:
-                    header, data = read_sheet_rows(z, name_map['Explicit_Refs_Only'], sst)
-                    if header and data:
-                        # locate Valor (BRL) or VALOR A PAGAR - EDITORA
-                        try:
-                            v_idx = header.index('Valor (BRL)')
-                        except ValueError:
-                            v_idx = header.index('VALOR A PAGAR - EDITORA') if 'VALOR A PAGAR - EDITORA' in header else -1
-                        for r in data:
-                            amount = 0.0
-                            if v_idx >= 0 and v_idx < len(r):
-                                v = r[v_idx]
-                                try:
-                                    amount = float(v)
-                                except Exception:
-                                    amount = parse_currency_robust(v)
-                            if amount > 0:
-                                explicit_rows.append([provider, stem] + r + [f"{amount:.2f}"])
-                # read alias
                 alias_sheet = 'Low Probability Matches SBT' if 'Low Probability Matches SBT' in name_map else ('Artist_Alias_Eligible' if 'Artist_Alias_Eligible' in name_map else None)
                 if alias_sheet and alias_sheet in name_map:
                     header, data = read_sheet_rows(z, name_map[alias_sheet], sst)
@@ -194,20 +189,50 @@ def main():
         except Exception:
             continue
 
-    # Write CSVs
-    if explicit_rows:
-        out1 = PROC / 'Eligible_Value_Explicit_All_Providers.csv'
-        with open(out1, 'w', newline='', encoding='utf-8') as f:
-            w = csv.writer(f)
-            w.writerow(['provider','file_stem','...columns...','amount_numeric'])
-            w.writerows(explicit_rows)
+
+def write_alias_values_csv(alias_rows):
+    out2 = PROC / 'Eligible_Value_Alias_All_Providers.csv'
     if alias_rows:
-        out2 = PROC / 'Eligible_Value_Alias_All_Providers.csv'
         with open(out2, 'w', newline='', encoding='utf-8') as f:
             w = csv.writer(f)
-            w.writerow(['provider','file_stem','...columns...','amount_numeric'])
+            # best-effort header; depends on source sheet columns
+            w.writerow(['provider','file_stem','title','artist','valor_text','Valor (BRL)','Valor (BRL, sem centavos)'])
             w.writerows(alias_rows)
+    return out2
+
+
+def main():
+    stem_to_provider = build_stem_provider_map()
+
+    # Explicit values (fast path from consolidated explicit CSV)
+    explicit_in = PROC / 'Eligible_Explicit_All_Providers.csv'
+    explicit_out = PROC / 'Eligible_Value_Explicit_All_Providers.csv'
+    if explicit_in.exists():
+        try:
+            with open(explicit_in, 'r', encoding='utf-8', newline='') as inf, \
+                 open(explicit_out, 'w', encoding='utf-8', newline='') as outf:
+                rin = csv.DictReader(inf)
+                cols = rin.fieldnames or []
+                # Keep a useful subset + numeric amount
+                keep = ['provider','file_stem'] + [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'}]
+                w = csv.DictWriter(outf, fieldnames=keep + ['amount_numeric'])
+                w.writeheader()
+                for row in rin:
+                    amt = parse_currency_robust(row.get('VALOR A PAGAR - EDITORA',''))
+                    if amt > 0:
+                        out = {k: row.get(k, '') for k in keep}
+                        out['amount_numeric'] = f"{amt:.2f}"
+                        w.writerow(out)
+        except Exception:
+            pass
+
+    # Alias values
+    alias_rows: list[list[str]] = []
+    # Prefer existing consolidated alias file; if absent, derive from xlsx
+    alias_in = PROC / 'Eligible_Value_Alias_All_Providers.csv'
+    if not alias_in.exists():
+        write_alias_values_from_xlsx(stem_to_provider, alias_rows)
+        write_alias_values_csv(alias_rows)
 
 if __name__ == '__main__':
     main()
-

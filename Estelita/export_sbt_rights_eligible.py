@@ -254,6 +254,17 @@ def main():
     with pd.ExcelWriter(out_xlsx) as wr:
         explicit.to_excel(wr, sheet_name='Explicit_Refs_Only', index=False)
         alias_only.to_excel(wr, sheet_name='Low Probability Matches SBT', index=False)
+    # Also write CSV copies for downstream consolidation
+    explicit_csv = OUT_DIR / (xl_path.stem + '__eligible_explicit.csv')
+    alias_csv = OUT_DIR / (xl_path.stem + '__eligible_alias.csv')
+    try:
+        explicit.to_csv(explicit_csv, index=False)
+    except Exception:
+        pass
+    try:
+        alias_only.to_csv(alias_csv, index=False)
+    except Exception:
+        pass
     print(f'Saved eligible workbook: {out_xlsx}')
 
     # Add numeric amount columns to sheets and recompute totals with robust parsing

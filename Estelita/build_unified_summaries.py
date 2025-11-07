@@ -88,9 +88,39 @@ def explicit_counts_for_stem(stem: str) -> tuple[int, int]:
     return explicit_rows, explicit_with_value_rows
 
 
-def unified_lastcol_counts(stem: str) -> int:
-    """Return count of rows with positive integer amounts in the last column
-    of the unified raw workbook for this stem."""
+def is_currency_like(s: str) -> bool:
+    s = str(s or '').strip()
+    if not s:
+        return False
+    s = s.replace(' ', '')
+    return bool(re.search(r"^(R\$|\$)?\d{1,3}([.,]\d{3})*([.,]\d{2})$|^(R\$|\$)?\d+$", s))
+
+
+def detect_amount_column(df: pd.DataFrame) -> str | None:
+    # Prefer named columns first
+    for name in df.columns:
+        n = str(name).strip().lower()
+        if n in { 'valor (brl)', 'valor a pagar - editora', 'valor', 'amount', 'montante'}:
+            return name
+    # Otherwise, pick the column with most currency-like cells
+    best_col = None
+    best_hits = 0
+    for name in df.columns:
+        series = df[name]
+        try:
+            hits = int(series.apply(is_currency_like).sum())
+        except Exception:
+            hits = 0
+        if hits > best_hits:
+            best_hits = hits
+            best_col = name
+    # Require at least some hits to consider it an amount column
+    return best_col if best_hits >= 3 else None
+
+
+def unified_amount_counts(stem: str) -> int:
+    """Return count of rows with positive integer amounts in the detected
+    amount column of the unified raw workbook for this stem."""
     raw = RAWU / f"{stem}.xlsx"
     if not raw.exists():
         return 0
@@ -106,8 +136,8 @@ def unified_lastcol_counts(stem: str) -> int:
             continue
         if df is None or df.empty:
             continue
-        last_col = df.columns[-1]
-        vals = df[last_col].map(to_int_amount)
+        amt_col = detect_amount_column(df) or df.columns[-1]
+        vals = df[amt_col].map(to_int_amount)
         total += int((vals > 0).sum())
     return total
 
@@ -117,7 +147,7 @@ def main():
     for p in sorted(RAWU.glob('*.xlsx')):
         stem = p.stem
         exp_rows, exp_val_rows = explicit_counts_for_stem(stem)
-        un_last = unified_lastcol_counts(stem)
+        un_last = unified_amount_counts(stem)
         rows.append({
             'file_stem': stem,
             'explicit_rows': exp_rows,
@@ -131,4 +161,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

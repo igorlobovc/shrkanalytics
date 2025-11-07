@@ -89,7 +89,7 @@ def find_title_artist_columns(df: pd.DataFrame):
         c_title = find_col(['titulo original','titulo','title'])
     c_artist = find_col(['intérprete','interprete','artista','autor','artist','author'])
     c_editora = find_col(['editora','publisher'])
-    c_valor = find_col(['valor a pagar','valor','montante','amount'])
+    c_valor = find_col(['valor a pagar','valor','montante','amount','total'])
     c_percent = find_col(['percentual','percent','%'])
     return c_title, c_artist, c_editora, c_valor, c_percent
 
@@ -318,6 +318,8 @@ def main():
 
     def add_amount_columns(df: pd.DataFrame) -> pd.DataFrame:
         amt = next((c for c in df.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
+        if not amt:
+            amt = next((c for c in df.columns if str(c).strip().lower() == 'total'), None)
         if amt:
             df['Valor (BRL)'] = df[amt].apply(parse_currency_robust)
             df['Valor (BRL, sem centavos)'] = df['Valor (BRL)'].apply(lambda v: int(v))
@@ -326,6 +328,8 @@ def main():
     explicit = add_amount_columns(explicit)
     alias_only = add_amount_columns(alias_only)
     amt_col_full = next((c for c in full.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
+    if not amt_col_full:
+        amt_col_full = next((c for c in full.columns if str(c).strip().lower() == 'total'), None)
     sum_brl = float(full[amt_col_full].apply(parse_currency_robust).sum()) if amt_col_full else total_amount
 
     # Summary CSV

@@ -204,7 +204,7 @@ def classify_values_from_workbook(xlsx: Path, provider: str):
         # Identify columns
         col_unc = find_col(df, ['Uncertain Match','uncertain_match'])
         col_basis = find_col(df, ['Eligibility Basis','eligibility basis'])
-        col_amt = find_col(df, ['VALOR A PAGAR - EDITORA','Valor (BRL)'])
+        col_amt = find_col(df, ['VALOR A PAGAR - EDITORA','Valor (BRL)','Total'])
         if col_amt is None:
             # Fallback: take the last column if present
             if df.shape[1] >= 1:
@@ -213,7 +213,8 @@ def classify_values_from_workbook(xlsx: Path, provider: str):
                 # no columns at all
                 continue
         # Build amount_cents (default to 0 if conversion fails)
-        if str(col_amt).strip().lower() == 'valor (brl)':
+        amt_name = str(col_amt).strip().lower()
+        if amt_name in ('valor (brl)', 'total'):
             cents = (pd.to_numeric(df[col_amt], errors='coerce').fillna(0.0)*100).round().astype(int)
         else:
             cents = to_cents_series(df[col_amt])

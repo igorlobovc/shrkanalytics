@@ -122,3 +122,19 @@ Outputs:
 - By provider: `Estelita/Processed/Fornecedores_ByProvider_Summary.csv`
 - Explicit only (all providers): `Estelita/Processed/Eligible_Explicit_All_Providers.csv`
   - Combined export of the `Explicit_Refs_Only` sheets for quick finance review.
+
+### Unified Workbooks (sheet-based, integer amounts)
+
+- Inputs tracked in Git: `Estelita/Raw/Unified/*.xlsx`
+- Rollups (sheet-based classification):
+  - With value
+    - Explicit: `Estelita/Processed/Eligible_Value_Explicit_All_Providers.csv`
+    - Low probability / alias: `Estelita/Processed/Eligible_Value_Alias_All_Providers.csv`
+  - Without value
+    - Explicit: `Estelita/Processed/Explicit_Without_Value_All_Providers.csv`
+    - Low probability / alias: `Estelita/Processed/Alias_Without_Value_All_Providers.csv`
+  - Notes: Amounts are normalized to integer cents; integer BRL is provided for totals. Classification follows sheet names (`Explicit_Refs_Only` vs sheets containing `Low Probability`/`Alias`).
+
+- Unified summary: `Estelita/Processed/Summaries/Unified_Explicit_Summary.csv`
+  - Columns: `file_stem`, `explicit_rows`, `explicit_with_value_rows`, `unified_lastcol_amount_rows`
+  - `explicit_*` are taken from processed `__eligible_with_refs.xlsx` (Explicit_Refs_Only). `unified_lastcol_amount_rows` scans the original unified workbook to detect the best amount column (by name or currency-like values) and counts rows with positive amounts.

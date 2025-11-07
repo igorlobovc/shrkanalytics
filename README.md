@@ -66,7 +66,7 @@ This repo now includes a focused pipeline to match supplier sheets and prioritiz
 - `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx`
   - SBT “rights‑eligible” workbook (two tabs):
     - `Explicit_Refs_Only`: rows that intersect Estelita catalog by title and/or ISWC
-    - `Artist_Alias_Eligible`: rows eligible by represented artist or editora alias
+    - `Low Probability Matches SBT`: rows eligible by represented artist or editora alias
   - All rows include:
     - `Matched Title`, `Matched Identifier/ISWC`, `Eligibility Basis`, `Uncertain Match`
 
@@ -115,3 +115,10 @@ Outputs:
 - `Estelita/Processed/Eligible_Catalog.csv`, `Eligible_Artists.txt`
 - `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx`
 - `Estelita/Processed/SBT_Rights_Eligible_Summary.csv`
+## 📊 Consolidated Summaries
+
+- General (all files): `Estelita/Processed/Fornecedores_Summary.csv`
+  - Columns: provider, file_stem, matches_rows, eligible_explicit_rows, eligible_alias_rows, sum_valor_brl_explicit
+- By provider: `Estelita/Processed/Fornecedores_ByProvider_Summary.csv`
+- Explicit only (all providers): `Estelita/Processed/Eligible_Explicit_All_Providers.csv`
+  - Combined export of the `Explicit_Refs_Only` sheets for quick finance review.

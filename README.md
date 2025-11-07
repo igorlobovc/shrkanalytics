@@ -139,6 +139,13 @@ Outputs:
   - Columns: `file_stem`, `explicit_rows`, `explicit_with_value_rows`, `unified_lastcol_amount_rows`
   - `explicit_*` are taken from processed `__eligible_with_refs.xlsx` (Explicit_Refs_Only). `unified_lastcol_amount_rows` scans the original unified workbook to detect the best amount column (by name or currency-like values) and counts rows with positive amounts.
 
+### Provider Rollup (Explicit + Alias)
+
+- `Estelita/Processed/Summaries/Providers_Explicit_Alias_Summary.csv`
+  - Columns: provider, explicit_rows_total, explicit_with_rows, explicit_value_brl_int,
+             alias_rows_total, alias_with_rows, alias_value_brl_int
+  - Built from the four sheet-based rollups (with/without value) to give a single view per provider.
+
 ## 🚀 Running the Full Pipeline
 
 - End-to-end run across Raw/Fornecedores and Raw/Unified:

@@ -173,21 +173,39 @@ def eligible_stats_from_consolidated_csvs(base_stem: str) -> tuple[int, int, flo
     alias_amt_rows = 0
 
     import csv
-    exp_csv = PROC / 'Eligible_Explicit_All_Providers.csv'
-    if exp_csv.exists():
+    # Prefer normalized explicit value-only CSV when present
+    exp_val = PROC / 'Eligible_Value_Explicit_All_Providers.csv'
+    if exp_val.exists():
         try:
-            with open(exp_csv, 'r', encoding='utf-8', newline='') as f:
+            with open(exp_val, 'r', encoding='utf-8', newline='') as f:
                 r = csv.DictReader(f)
                 for row in r:
                     if row.get('file_stem') != base_stem:
                         continue
                     exp_rows += 1
-                    amt = parse_currency_robust(row.get('VALOR A PAGAR - EDITORA', ''))
-                    if amt > 0:
+                    cents = int(row.get('amount_cents') or '0')
+                    if cents > 0:
                         exp_amt_rows += 1
-                        sum_exp += amt
+                        sum_exp += cents/100.0
         except Exception:
             pass
+    else:
+        # Fallback: read unnormalized explicit consolidated and parse
+        exp_csv = PROC / 'Eligible_Explicit_All_Providers.csv'
+        if exp_csv.exists():
+            try:
+                with open(exp_csv, 'r', encoding='utf-8', newline='') as f:
+                    r = csv.DictReader(f)
+                    for row in r:
+                        if row.get('file_stem') != base_stem:
+                            continue
+                        exp_rows += 1
+                        amt = parse_currency_robust(row.get('VALOR A PAGAR - EDITORA', ''))
+                        if amt > 0:
+                            exp_amt_rows += 1
+                            sum_exp += amt
+            except Exception:
+                pass
     alias_csv = PROC / 'Eligible_Value_Alias_All_Providers.csv'
     if alias_csv.exists():
         try:
@@ -197,13 +215,10 @@ def eligible_stats_from_consolidated_csvs(base_stem: str) -> tuple[int, int, flo
                     if row.get('file_stem') != base_stem:
                         continue
                     alias_rows += 1
-                    try:
-                        val = float(row.get('Valor (BRL)', '0') or 0)
-                    except Exception:
-                        val = 0.0
-                    if val > 0:
+                    cents = int(row.get('amount_cents') or '0')
+                    if cents > 0:
                         alias_amt_rows += 1
-                        sum_alias += val
+                        sum_alias += cents/100.0
         except Exception:
             pass
     return exp_rows, alias_rows, sum_exp, exp_amt_rows, alias_amt_rows, sum_alias

@@ -209,30 +209,59 @@ def main():
     explicit_out = PROC / 'Eligible_Value_Explicit_All_Providers.csv'
     if explicit_in.exists():
         try:
-            with open(explicit_in, 'r', encoding='utf-8', newline='') as inf, \
-                 open(explicit_out, 'w', encoding='utf-8', newline='') as outf:
+            with open(explicit_in, 'r', encoding='utf-8', newline='') as inf:
                 rin = csv.DictReader(inf)
+                rows = []
                 cols = rin.fieldnames or []
-                # Keep a useful subset + numeric amount; avoid duplicates
-                base_keep = ['provider','file_stem']
-                rest = [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'} and c not in base_keep]
-                keep = base_keep + rest
-                w = csv.DictWriter(outf, fieldnames=keep + ['amount_numeric'])
-                w.writeheader()
                 for row in rin:
                     amt = parse_currency_robust(row.get('VALOR A PAGAR - EDITORA',''))
                     if amt > 0:
+                        rows.append((row, amt))
+            if rows:
+                with open(explicit_out, 'w', encoding='utf-8', newline='') as outf:
+                    # Keep a useful subset + numeric amount; avoid duplicates
+                    base_keep = ['provider','file_stem']
+                    rest = [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'} and c not in base_keep]
+                    keep = base_keep + rest
+                    w = csv.DictWriter(outf, fieldnames=keep + ['amount_numeric','amount_cents'])
+                    w.writeheader()
+                    for row, amt in rows:
                         out = {k: row.get(k, '') for k in keep}
                         out['amount_numeric'] = f"{amt:.2f}"
+                        out['amount_cents'] = str(int(round(amt*100)))
                         w.writerow(out)
         except Exception:
             pass
 
     # Alias values
-    alias_rows: list[list[str]] = []
-    # Prefer existing consolidated alias file; if absent, derive from xlsx
+    # Normalize/ensure alias values include integer cents
     alias_in = PROC / 'Eligible_Value_Alias_All_Providers.csv'
-    if not alias_in.exists():
+    if alias_in.exists():
+        try:
+            with open(alias_in, 'r', encoding='utf-8', newline='') as inf:
+                rin = csv.DictReader(inf)
+                data = [row for row in rin]
+            if data:
+                # Re-write file with amount_cents added
+                fieldnames = list(data[0].keys())
+                if 'amount_cents' not in fieldnames:
+                    fieldnames = fieldnames + ['amount_cents']
+                with open(alias_in, 'w', encoding='utf-8', newline='') as outf:
+                    w = csv.DictWriter(outf, fieldnames=fieldnames)
+                    w.writeheader()
+                    for row in data:
+                        v = row.get('Valor (BRL)') or row.get('amount_numeric') or '0'
+                        try:
+                            amt = float(v)
+                        except Exception:
+                            amt = 0.0
+                        row['amount_cents'] = str(int(round(amt*100)))
+                        w.writerow(row)
+        except Exception:
+            pass
+    else:
+        # Derive alias from xlsx if not present
+        alias_rows: list[list[str]] = []
         write_alias_values_from_xlsx(stem_to_provider, alias_rows)
         write_alias_values_csv(alias_rows)
 

@@ -28,21 +28,23 @@ def load_explicit() -> pd.DataFrame:
     cols = list(df.columns)
     if 'provider.1' in cols and 'file_stem.1' in cols:
         df = df.rename(columns={'provider':'provider_src','file_stem':'file_stem_src','provider.1':'provider','file_stem.1':'file_stem'})
-    # Ensure numeric amount column exists
-    if 'amount_numeric' in df.columns:
-        df['amount_numeric'] = pd.to_numeric(df['amount_numeric'], errors='coerce').fillna(0.0)
+    # Ensure integer cents column exists and filter to positive
+    if 'amount_cents' in df.columns:
+        df['amount_cents'] = pd.to_numeric(df['amount_cents'], errors='coerce').fillna(0).astype(int)
     else:
-        if 'VALOR A PAGAR - EDITORA' in df.columns:
-            def parse_brl(s: str) -> float:
+        if 'amount_numeric' in df.columns:
+            df['amount_cents'] = (pd.to_numeric(df['amount_numeric'], errors='coerce').fillna(0.0) * 100).round().astype(int)
+        elif 'VALOR A PAGAR - EDITORA' in df.columns:
+            def parse_brl_to_cents(s: str) -> int:
                 v = str(s or '').strip().replace('R$','').replace(' ','').replace('.','').replace(',', '.')
                 try:
-                    return float(v)
+                    return int(round(float(v)*100))
                 except Exception:
-                    return 0.0
-            df['amount_numeric'] = df['VALOR A PAGAR - EDITORA'].map(parse_brl)
+                    return 0
+            df['amount_cents'] = df['VALOR A PAGAR - EDITORA'].map(parse_brl_to_cents)
         else:
-            df['amount_numeric'] = 0.0
-    return df[df['amount_numeric'] > 0].copy()
+            df['amount_cents'] = 0
+    return df[df['amount_cents'] > 0].copy()
 
 
 def load_alias() -> pd.DataFrame:
@@ -50,14 +52,16 @@ def load_alias() -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     df = pd.read_csv(path)
-    # Try to ensure a numeric value column exists
-    if 'amount_numeric' in df.columns:
-        df['amount_numeric'] = pd.to_numeric(df['amount_numeric'], errors='coerce').fillna(0.0)
+    # Ensure integer cents exists
+    if 'amount_cents' in df.columns:
+        df['amount_cents'] = pd.to_numeric(df['amount_cents'], errors='coerce').fillna(0).astype(int)
+    elif 'amount_numeric' in df.columns:
+        df['amount_cents'] = (pd.to_numeric(df['amount_numeric'], errors='coerce').fillna(0.0)*100).round().astype(int)
     elif 'Valor (BRL)' in df.columns:
-        df['amount_numeric'] = pd.to_numeric(df['Valor (BRL)'], errors='coerce').fillna(0.0)
+        df['amount_cents'] = (pd.to_numeric(df['Valor (BRL)'], errors='coerce').fillna(0.0)*100).round().astype(int)
     else:
-        df['amount_numeric'] = 0.0
-    return df[df['amount_numeric'] > 0].copy()
+        df['amount_cents'] = 0
+    return df[df['amount_cents'] > 0].copy()
 
 
 def main():
@@ -72,4 +76,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

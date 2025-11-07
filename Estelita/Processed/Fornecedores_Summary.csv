@@ -1,11 +1,11 @@
 provider,file_stem,matches_rows,eligible_explicit_rows,eligible_alias_rows,sum_valor_brl_explicit
-Aparecida,01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA,7,7,0,0.00
-Aparecida,03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA,17,17,0,0.00
-Aparecida,12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA,18,18,0,0.00
-Band,band UNIFICADO out dez 2023 jan fev 2024,113,113,0,0.00
-Canal Brasil,Relatorio_CanalBrasil_Jan24,1,1,0,0.00
-Canal Brasil,Ubem_CanalBrasil_Fev24 (1),1,1,0,0.00
-Canal Brasil,Ubem_CanalBrasil_Março24 (1),1,1,0,0.00
+Aparecida,01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA,7,0,0,0.00
+Aparecida,03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA,17,0,0,0.00
+Aparecida,12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA,18,0,0,0.00
+Band,band UNIFICADO out dez 2023 jan fev 2024,113,8,43,0.00
+Canal Brasil,Relatorio_CanalBrasil_Jan24,1,0,0,0.00
+Canal Brasil,Ubem_CanalBrasil_Fev24 (1),1,0,0,0.00
+Canal Brasil,Ubem_CanalBrasil_Março24 (1),1,0,0,0.00
 Desconhecido,Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24,4,4,0,52.00
 Globo,MusicCueSheet_TvAberta_Agosto2023,58,58,0,1312.00
 Globo,MusicCueSheet_TvAberta_Outubro2023,45,45,0,2358.00

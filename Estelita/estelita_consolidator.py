@@ -6,14 +6,19 @@ import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
 from pathlib import Path
-from rapidfuzz import fuzz
-from unidecode import unidecode
+try:
+    from unidecode import unidecode
+except Exception:
+    # Fallback if unidecode is unavailable
+    def unidecode(x):
+        return x
 import re
 import json
 from datetime import datetime
 
 # === ENVIRONMENT & PATH SETUP === #
-BASE_DIR = Path("/Users/igorcunha/SHRKVSCODE/Estelita")
+# Use directory of this file as base to work within the repo
+BASE_DIR = Path(__file__).resolve().parent
 VENV_PYTHON = "/usr/local/bin/python3"
 
 RAW_OBRAS_PATH = BASE_DIR / "Raw/ESTELITA OBRAS_v2.xlsx"
@@ -53,7 +58,11 @@ def parse_duration(d):
 
 # === CORE LOAD FUNCTION === #
 def load_xlsx(path, expected_sheet=None):
-    return pd.read_excel(path, sheet_name=expected_sheet) if path.exists() else pd.DataFrame()
+    if not path.exists():
+        return pd.DataFrame()
+    if expected_sheet is None:
+        return pd.read_excel(path)
+    return pd.read_excel(path, sheet_name=expected_sheet)
 
 def load_duckdb_table(db_path, table_name):
     con = duckdb.connect(str(db_path))
@@ -75,7 +84,10 @@ combined = pd.concat([obras_df, obras_db_df, fonos_df, fonos_db_df], ignore_inde
 for col in combined.columns:
     combined[col] = combined[col].apply(normalize_text)
 
-combined["duration_seconds"] = combined.get("duracao", "").apply(parse_duration)
+if "duracao" in combined.columns:
+    combined["duration_seconds"] = combined["duracao"].apply(parse_duration)
+else:
+    combined["duration_seconds"] = None
 
 # === SYNTHETIC ID GENERATION === #
 combined["work_id"] = combined.apply(lambda row: f"OBR_{row.name+1:06}" if "iswc" in row and row["iswc"] else "", axis=1)
@@ -93,6 +105,10 @@ deduped["title"] = deduped["titulo"].apply(title_case)
 deduped["artist"] = deduped["autor"].apply(title_case)
 deduped["association"] = deduped["associacao"].str.upper()
 deduped["confidence"] = 1.0  # Placeholder for matching confidence
+
+# Ensure output directories exist
+(BASE_DIR / "Processed").mkdir(parents=True, exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # === OUTPUT FILES === #
 table = pa.Table.from_pandas(deduped)

@@ -1,0 +1,50 @@
+provider,file,sheet,has_title,total_rows,musical_rows,artist_ratio,has_amounts,amount_rows,has_percent,percent_rows,has_dates,match_rate,noise_ratio,readiness_score
+SBT,Unificado SBT nov dez 23 e jan fev mar 24.xls,Relatório Solicitação,True,5096,5096,100.0,True,5049,True,5096,True,3.54,0.26,95.0
+Band,band UNIFICADO out dez 2023 jan fev 2024.xls,Relatorio_UBEM,True,2563,2563,100.0,False,0,False,0,True,4.03,0.08,30.0
+Desconhecido,Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24.xlsx,MusicCueSheet_Globoplay_Jan24,True,77,77,100.0,False,0,False,0,True,7.14,0.0,30.0
+Globo,MusicCueSheet_TvAberta_Agosto2023.xlsx,MusicCueSheet_Agosto23,True,1505,1505,100.0,False,0,False,0,True,3.31,0.27,30.0
+Globo,MusicCueSheet_TvAberta_Outubro2023.xlsx,MusicCueSheet_TvAberta_Out23,True,1307,1307,100.0,False,0,False,0,True,4.17,0.23,30.0
+Globo,Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24.xlsx,MusicCueSheet_Globoplay_Jan24,True,77,77,100.0,False,0,False,0,True,7.14,0.0,30.0
+Globo,Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23.xlsx,MusicCueSheet_Globoplay_Nov23,True,129,129,100.0,False,0,False,0,True,2.67,0.0,30.0
+Globoplay,MusicCueSheet_OriginaisGloboplay_Outubro2023.xlsx,MusicCueSheet_Globoplay_Out2023,True,412,412,100.0,False,0,False,0,True,0.9,0.0,25.0
+Aparecida,01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA.xlsx,Sincronização Musical,True,379,379,0.0,False,0,False,0,False,2.14,0.0,10.0
+Aparecida,03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA.xlsx,Sincronização Musical,True,408,408,0.0,False,0,False,0,False,3.21,0.25,10.0
+Aparecida,12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA.xlsx,Sincronização Musical,True,515,515,0.0,False,0,False,0,False,2.94,0.0,10.0
+Band,Relatorio_UBEM band out2023.xls,Relatorio_UBEM,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Band,Relatório_UBEM_TV_Bandeirantes_Dezembro2024.xlsx,Relatorio_UBEM,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Band,Relatório_UBEM_TV_Bandeirantes_Dezembro2024_MelhorDaNoite.xlsx,Relatorio_UBEM,True,403,403,0.0,False,0,False,0,False,0.0,0.0,0.0
+Band,Relatório_UBEM_TV_Bandeirantes_Fevereiro2024.xls,Relatorio_UBEM,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Band,Relatório_UBEM_TV_Bandeirantes_Janeiro2024.xls,Relatorio_UBEM,True,878,878,0.0,False,0,False,0,False,0.0,0.0,0.0
+Globo,Globoplay_NovelasDeAcervo_Dezembro2023.xlsx,NovelasAcervo_Globoplay_Dez23,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Globo,NovelasAcervo_Novembro2023.xlsx,Globoplay_Novembro2023,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Ubem Shark,Ubem Shark.xlsx,Controle,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Ubem Shark,Ubem Shark.xlsx,Página1,False,0,0,0.0,False,0,False,0,False,0.0,1.0,0.0
+Canal Brasil,Relatorio_CanalBrasil_Jan24.xlsx,CanalBrasil_Janeiro24,True,232,232,0.0,False,0,False,0,False,20.0,98.28,-5.0
+Canal Brasil,Ubem_CanalBrasil_Fev24 (1).xlsx,CanalBrasil_Fevereiro24,True,276,276,0.0,False,0,False,0,False,20.0,98.91,-5.0
+Canal Brasil,Ubem_CanalBrasil_Março24 (1).xlsx,Relatório UBEM - Canal Brasil,True,394,394,0.0,False,0,False,0,False,16.67,98.98,-5.0
+Globo,Relatorio_CanaisGlobo__Jan24.xlsx,CanaisGlobo_Janeiro24,True,10987,10987,0.0,False,0,False,0,False,16.67,99.96,-5.0
+Globo,Ubem_CanaisGlobo_Março24.xlsx,Relatório UBEM - Canais Globo,True,9144,9144,0.0,False,0,False,0,False,12.5,99.95,-5.0
+Globo,Ubem_RelatórioGlobo_FEV24.xlsx,CanaisGlobo_Fevereiro24,True,8878,8878,0.0,False,0,False,0,False,16.67,99.95,-5.0
+Globoplay,Relatorio_Globoplay_Jan24.xlsx,Globoplay_Janeiro24,True,384,384,0.0,False,0,False,0,False,20.0,99.22,-5.0
+Globoplay,Ubem_RelatórioGloboplay_Fev24.xlsx,Globoplay_Fevereiro24,True,32,32,0.0,False,0,False,0,False,20.0,90.62,-5.0
+SBT,01. Solicitação janeiro 2024.xls,Relatório Solicitação,True,1281,1281,0.0,False,0,False,0,False,0.0,25.06,-5.0
+SBT,02. Solicitação fevereiro 2024.xls,Relatório Solicitação,True,1281,1281,0.0,False,0,False,0,False,0.0,28.42,-5.0
+SBT,11. Solicitação novembro 2023.xls,Relatório Solicitação,True,856,856,0.0,False,0,False,0,False,0.0,26.99,-5.0
+SBT,12. Solicitação dezembro 2023.xls,Relatório Solicitação,True,775,775,0.0,False,0,False,0,False,0.0,27.35,-5.0
+SBT,3. Solicitação Março 2024.xls,Relatório Solicitação,True,918,918,0.0,False,0,False,0,False,0.0,36.17,-5.0
+Globo,CanalBrasil_Dezembro2023.xlsx,CanalBrasil_Dezembro2023,True,372,372,0.0,False,0,False,0,False,0.0,99.19,-15.0
+Globo,CanalBrasil_Novembro2023.xlsx,CanalBrasil_Novembro2023,True,110,110,0.0,False,0,False,0,False,0.0,97.27,-15.0
+Globo,CanalInternacional_Dezembro2023.xlsx,CanalInternacional_Dezembro2023,True,327,327,0.0,False,0,False,0,False,0.0,98.78,-15.0
+Globo,CanalInternacional_Novembro2023.xlsx,CanalInternacional_Novembro2023,True,218,218,0.0,False,0,False,0,False,0.0,98.17,-15.0
+Globo,CanalViva_Dezembro2023.xlsx,CanalViva_Dezembro2023,True,1504,1504,0.0,False,0,False,0,False,0.0,99.73,-15.0
+Globo,CanalViva_Novembro2023.xlsx,CanalViva_Novembro2023,True,1474,1474,0.0,False,0,False,0,False,0.0,99.73,-15.0
+Globo,ConsolidadoClipes_Dezembro2023.xlsx,ConsolidadoClipes_Dez23,True,1654,1654,0.0,False,0,False,0,False,0.0,99.82,-15.0
+Globo,ConsolidadoClipes_Novembro.xlsx,ConsolidadoClipes_Nov2023,True,1415,1415,0.0,False,0,False,0,False,0.0,99.79,-15.0
+Globo,ConsolidadoDiversos_Dezembro2023.xlsx,ConsolidadoDiversos_Dezembro23,True,9056,9056,0.0,False,0,False,0,False,0.0,99.87,-15.0
+Globo,ConsolidadoDiversos_Novembro2023.xlsx,TvFechada_Novembro2023,True,9222,9222,0.0,False,0,False,0,False,0.0,99.79,-15.0
+Globo,Globonews_Dezembro2023.xlsx,Globonews_Dezembro2023,True,222,222,0.0,False,0,False,0,False,0.0,98.2,-15.0
+Globo,Globonews_Novembro2023.xlsx,Globonews_Novembro2023,True,42,42,0.0,False,0,False,0,False,0.0,90.48,-15.0
+Globo,Sportv_Dezembro2023.xlsx,Sportv_Dezembro2023,True,22,22,0.0,False,0,False,0,False,0.0,81.82,-15.0
+Globo,Sportv_Novembro2023.xlsx,Sportv_Novembro2023,True,18,18,0.0,False,0,False,0,False,0.0,77.78,-15.0
+Globo,TvAberta_Dezembro2023.xlsx,TvAberta_Dezembro2023,True,3848,3848,0.0,False,0,False,0,False,0.0,99.92,-15.0
+Globo,TvAberta_Novembro2023.xlsx,TvAberta_Novembro2023,True,3161,3161,0.0,False,0,False,0,False,0.0,99.91,-15.0

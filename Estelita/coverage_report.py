@@ -10,17 +10,21 @@ import duckdb
 import pandas as pd
 from pathlib import Path
 
-base = Path("/Users/igorcunha/SHRKVSCODE/Estelita")
+base = Path(__file__).resolve().parent
 db_path = base / "primary_archive.duckdb"
 out_path = base / "Processed/Coverage_Report.xlsx"
 
 con = duckdb.connect(str(db_path))
 print("📊 Connected to database…")
 
-# Install and load Excel extension
-con.execute("INSTALL excel")
-con.execute("LOAD excel")
-print("📑 Excel extension loaded...")
+# Install and load Excel extension (safe if already installed)
+try:
+    con.execute("INSTALL excel")
+    con.execute("LOAD excel")
+    print("📑 Excel extension loaded...")
+except Exception:
+    # If extension install/load fails, continue; pandas writer will still work
+    pass
 
 # --- Coverage summary ---
 coverage = con.execute("""

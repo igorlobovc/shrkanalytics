@@ -43,3 +43,58 @@ Additional data may come from:
   `work_id`, `recording_id`, `title`, `artist`, `association`, provenance.
 
 ---
+
+## 📌 SBT Priority: What’s Included
+
+This repo now includes a focused pipeline to match supplier sheets and prioritize SBT for revenue collection:
+
+- Curated catalog (from OBRAS/Fonogramas):
+  - `Estelita/Processed/Curated_Titles_Authors.csv`
+- Batch matching and reporting tools:
+  - `Estelita/prepare_titles_and_match_suppliers.py` — build curated list and match a given supplier sheet
+  - `Estelita/batch_match_suppliers.py` — scan all fornecedores, compute coverage and top unmatched
+  - `Estelita/analyze_supplier_readiness.py` — score each sheet’s readiness (amounts, percent, dates, matchability)
+  - `Estelita/export_matches_from_supplier_file.py` — export a supplier workbook filtered to matched rows only, enriched with Matched Title and ISWC
+- In‑DB matcher (DuckDB):
+  - `Estelita/build_relations_duckdb.py` — detect columns by overlap, join WORKS ↔ RECORDINGS and profile inputs
+
+### SBT Deliverable (checked into Git)
+
+- `Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx`
+  - This is the SBT “matches‑only” workbook with two extra columns added per row:
+    - `Matched Title`
+    - `Matched Identifier/ISWC`
+
+### How to Reproduce Locally
+
+1) Build curated catalog (titles+authors) from OBRAS:
+
+```
+python3 Estelita/prepare_titles_and_match_suppliers.py
+```
+
+2) Batch match all fornecedores and produce coverage + unmatched:
+
+```
+python3 Estelita/batch_match_suppliers.py
+```
+
+3) Produce per‑file readiness scores (ranks sheets with revenue fields highest):
+
+```
+python3 Estelita/analyze_supplier_readiness.py
+```
+
+4) Export a supplier workbook filtered to matched rows, with reference columns:
+
+```
+SUPPLIER_FILE="/Users/…/Fornecedores/SBT/Unificado SBT nov dez 23 e jan fev mar 24.xls" \
+  python3 Estelita/export_matches_from_supplier_file.py
+```
+
+Outputs are written to `Estelita/Processed/`.
+
+### Notes
+
+- The `.gitignore` allows committing the SBT deliverable workbook mentioned above so it’s accessible on GitHub.
+- Other large files (e.g., full `Processed/` outputs) are generated locally and typically not tracked, to keep the repo light.

@@ -235,8 +235,11 @@ def main():
         print('No eligible matches found to export.')
         return
     full = pd.concat(rows_all, ignore_index=True)
-    # Split into two tabs
-    explicit_mask = (full['Matched Title'].astype(str).str.strip()!='') | (full['Matched Identifier/ISWC'].astype(str).str.strip()!='')
+    # Split into two tabs (robust emptiness check: ignore NaN and literal 'nan')
+    def _nonempty(col: pd.Series) -> pd.Series:
+        s = col.astype(str)
+        return col.notna() & (s.str.strip() != '') & (~s.str.lower().eq('nan'))
+    explicit_mask = _nonempty(full['Matched Title']) | _nonempty(full['Matched Identifier/ISWC'])
     explicit = full[explicit_mask].copy()
     alias_only = full[~explicit_mask].copy()
 
@@ -250,8 +253,48 @@ def main():
     out_xlsx = OUT_DIR / (xl_path.stem + '__eligible_with_refs.xlsx')
     with pd.ExcelWriter(out_xlsx) as wr:
         explicit.to_excel(wr, sheet_name='Explicit_Refs_Only', index=False)
-        alias_only.to_excel(wr, sheet_name='Artist_Alias_Eligible', index=False)
+        alias_only.to_excel(wr, sheet_name='Low Probability Matches SBT', index=False)
     print(f'Saved eligible workbook: {out_xlsx}')
+
+    # Add numeric amount columns to sheets and recompute totals with robust parsing
+    def parse_currency_robust(value: str) -> float:
+        s = str(value or '').strip()
+        if not s:
+            return 0.0
+        s = s.replace('R$', '').replace(' ', '')
+        has_dot = '.' in s
+        has_comma = ',' in s
+        if has_dot and has_comma:
+            last_sep = s[max(s.rfind('.'), s.rfind(','))]
+            if last_sep == ',':
+                s = s.replace('.', '')
+                s = s.replace(',', '.')
+            else:
+                s = s.replace(',', '')
+        elif has_comma and not has_dot:
+            if re.search(r",\d{2}$", s):
+                s = s.replace(',', '.')
+            else:
+                s = s.replace(',', '')
+        elif has_dot and not has_comma:
+            if not re.search(r"\.\d{2}$", s):
+                s = s.replace('.', '')
+        try:
+            return float(s)
+        except Exception:
+            return 0.0
+
+    def add_amount_columns(df: pd.DataFrame) -> pd.DataFrame:
+        amt = next((c for c in df.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
+        if amt:
+            df['Valor (BRL)'] = df[amt].apply(parse_currency_robust)
+            df['Valor (BRL, sem centavos)'] = df['Valor (BRL)'].apply(lambda v: int(v))
+        return df
+
+    explicit = add_amount_columns(explicit)
+    alias_only = add_amount_columns(alias_only)
+    amt_col_full = next((c for c in full.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
+    sum_brl = float(full[amt_col_full].apply(parse_currency_robust).sum()) if amt_col_full else total_amount
 
     # Summary CSV
     summary = pd.DataFrame([
@@ -259,23 +302,16 @@ def main():
          'eligible_rows_total': len(full),
          'explicit_rows': len(explicit),
          'alias_only_rows': len(alias_only),
-         'sum_valor_editora_brl': round(total_amount, 2)}
+         'sum_valor_editora_brl': round(sum_brl, 2)}
     ])
     out_sum = OUT_DIR / 'SBT_Rights_Eligible_Summary.csv'
     summary.to_csv(out_sum, index=False)
     print(f'Summary saved: {out_sum}')
 
     # Print counts and top-20 explicit by amount
-    def parse_brl(value: str) -> float:
-        s = str(value or '').strip().replace('R$','').replace(' ','')
-        s = s.replace('.', '').replace(',', '.')
-        try:
-            return float(s)
-        except Exception:
-            return 0.0
     amt_col = next((c for c in explicit.columns if 'VALOR' in c.upper() and 'EDITORA' in c.upper()), None)
     if amt_col:
-        explicit['__amount'] = explicit[amt_col].apply(parse_brl)
+        explicit['__amount'] = explicit[amt_col].apply(parse_currency_robust)
         explicit_sorted = explicit.sort_values('__amount', ascending=False)
         cols_show = [c for c in ['DATA DE EXIBIÇÃO','PROGRAMA','EDITORA','NOME DA MÚSICA','INTERPRETE','PERCENTUAL A PAGAR - EDITORA',amt_col,'Matched Title','Matched Identifier/ISWC','Eligibility Basis'] if c in explicit_sorted.columns]
         print('EXPLICIT_COUNTS', len(explicit_sorted))

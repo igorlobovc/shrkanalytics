@@ -91,10 +91,14 @@ def main():
         c_miswc = find_col(df, ['Matched Identifier/ISWC'])
         c_basis = find_col(df, ['Eligibility Basis'])
         c_amt   = find_col(df, ['VALOR A PAGAR - EDITORA','Valor (BRL)','Total'])
+        c_unc   = find_col(df, ['Uncertain Match','uncertain_match'])
         c_src   = '__source_sheet' if '__source_sheet' in df.columns else None
         # assemble
         for _, r in df.iterrows():
             cents = to_cents(r.get(c_amt)) if c_amt else 0
+            # derive uncertainty flag
+            raw_unc = str(r.get(c_unc)).strip().lower() if c_unc else ''
+            is_uncertain = True if raw_unc == 'true' else (False if raw_unc == 'false' else True)
             rows.append({
                 'provider': provider,
                 'file_stem': stem,
@@ -108,15 +112,30 @@ def main():
                 'matched_title': str(r.get(c_mtitle)) if c_mtitle else None,
                 'matched_identifier_iswc': str(r.get(c_miswc)) if c_miswc else None,
                 'eligibility_basis': str(r.get(c_basis)) if c_basis else None,
+                'uncertain_match': is_uncertain,
                 'amount_cents': cents,
                 'amount_int': int(round(cents/100.0)) if cents else 0,
                 'valor_editora_brl': str(r.get(c_amt)) if c_amt else None,
             })
+    df_all = pd.DataFrame(rows)
     out = OUT / 'Explicit_Matches_All.csv'
-    pd.DataFrame(rows).to_csv(out, index=False)
-    print(f"Wrote: {out} ({len(rows)} rows)")
+    df_all.to_csv(out, index=False)
+    # Exact subset: uncertain_match == False
+    # Exact filter: Uncertain == False OR ISWC present OR basis mentions title/iswc catalog
+    import re
+    if 'uncertain_match' in df_all.columns:
+        mask_unc = df_all['uncertain_match'] == False
+    else:
+        mask_unc = False
+    mask_iswc = df_all['matched_identifier_iswc'].astype(str).str.match(r'^T-[0-9.]+-[0-9X]$', na=False)
+    basis = df_all['eligibility_basis'].astype(str).str.lower()
+    mask_basis = basis.str.contains('title_in_catalog|iswc_in_catalog', regex=True, na=False)
+    df_exact = df_all[mask_unc | mask_iswc | mask_basis].copy()
+    out2 = OUT / 'Explicit_Matches_Exact.csv'
+    df_exact.to_csv(out2, index=False)
+    print(f"Wrote: {out} ({len(df_all)} rows)")
+    print(f"Wrote: {out2} ({len(df_exact)} rows)")
 
 
 if __name__ == '__main__':
     main()
-

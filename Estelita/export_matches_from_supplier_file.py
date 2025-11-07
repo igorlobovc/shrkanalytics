@@ -171,8 +171,30 @@ def main():
                 for col in ['__title_norm','__author_norm','__is_match']:
                     if col in dfw.columns:
                         del dfw[col]
+            # Normalize currency columns (VALOR A PAGAR - EDITORA) to consistent pt-BR format
+            def _format_brl(x: str) -> str:
+                s = str(x or '').strip().replace('R$','').replace(' ','')
+                s = s.replace('.', '').replace(',', '.')
+                try:
+                    val = float(s)
+                    # pt-BR formatting: thousands as '.' and decimals as ','
+                    return 'R$ ' + f"{val:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                except Exception:
+                    return str(x or '')
+            amt_col = next((c for c in dfw.columns if 'VALOR' in str(c).upper() and 'EDITORA' in str(c).upper()), None)
+            if amt_col:
+                dfw[amt_col] = dfw[amt_col].apply(_format_brl)
             dfw.to_excel(wr, sheet_name=name[:31] or 'Sheet1', index=False)
     print(f"Saved filtered workbook: {out_path}")
+
+    # Also export a consolidated CSV for manual review across all sheets
+    all_rows = []
+    for name, fdf in sheets.items():
+        all_rows.append(fdf.assign(__sheet=name))
+    if all_rows:
+        review_csv = OUT_DIR / (xl_path.stem + "__matches_only_with_refs.csv")
+        pd.concat(all_rows, ignore_index=True).to_csv(review_csv, index=False)
+        print(f"Saved review CSV: {review_csv}")
 
 if __name__ == '__main__':
     main()

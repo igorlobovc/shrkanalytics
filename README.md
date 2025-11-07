@@ -165,6 +165,28 @@ Notes:
 - Amounts are normalized to integer cents; integer BRL is used for totals.
 - Explicit vs Alias classification follows sheet names: `Explicit_Refs_Only` vs sheets containing `Low Probability`/`Alias`.
 
+## 🧱 Normalize Fornecedores Sheets
+
+Use this to standardize vendor workbooks into a common schema for downstream analysis and QA.
+
+Command:
+
+```
+python3 Estelita/normalize_fornecedores.py
+```
+
+Outputs:
+- Summary index: `Estelita/Processed/Normalized/_summary.csv`
+  - Columns: provider, file, sheet, rows, found_columns
+  - Shows which canonical columns were detected per sheet
+- Per-sheet normalized CSVs: `Estelita/Processed/Normalized/<file>__<sheet>__normalized.csv`
+  - Standard columns (when present):
+    - provider, file, sheet
+    - programa, data_exibicao, numero_programa, exibicao_tipo, categoria_programa
+    - titulo_musica, autor, interprete, tipo_sincronizacao
+    - percentual_editora, valor_editora_brl, amount_cents, amount_int
+    - editora, gravadora, iswc, isrc
+
 ## 🧭 Git Protocols
 
 - Tracked inputs

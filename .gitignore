@@ -5,6 +5,8 @@ __pycache__/
 *.xlsx
 *.xls
 *.xlsb
+# Allow committing Unified raw workbooks
+!Estelita/Raw/Unified/*.xlsx
 # Allow committing the prioritized SBT matches workbook
 !Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx
 !Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx

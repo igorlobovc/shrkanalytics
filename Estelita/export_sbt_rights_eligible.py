@@ -47,9 +47,29 @@ def parse_brl(value: str) -> float:
     s = str(value or '').strip()
     if s == '' or s.lower() in {'nan','none','null'}:
         return 0.0
-    s = s.replace('R$','').replace(' ','')
-    # Replace thousands and decimal markers (pt-BR)
-    s = s.replace('.', '').replace(',', '.')
+    # Remove currency symbols and spaces
+    s = s.replace('R$','').replace('$','').replace(' ','')
+    # Replace thousands and decimal markers (pt-BR and US)
+    # Heuristic: if both separators exist, last one is decimal
+    has_dot = '.' in s
+    has_comma = ',' in s
+    if has_dot and has_comma:
+        last_sep = s[max(s.rfind('.'), s.rfind(','))]
+        if last_sep == ',':
+            s = s.replace('.', '')
+            s = s.replace(',', '.')
+        else:
+            s = s.replace(',', '')
+    elif has_comma and not has_dot:
+        # comma alone: decimal if ends with ,NN pattern; else thousand sep
+        if re.search(r",\d{2}$", s):
+            s = s.replace(',', '.')
+        else:
+            s = s.replace(',', '')
+    elif has_dot and not has_comma:
+        # dot alone: decimal if ends with .NN; else thousand sep
+        if not re.search(r"\.\d{2}$", s):
+            s = s.replace('.', '')
     try:
         return float(s)
     except Exception:
@@ -272,7 +292,8 @@ def main():
         s = str(value or '').strip()
         if not s:
             return 0.0
-        s = s.replace('R$', '').replace(' ', '')
+        # Strip common currency symbols and spaces
+        s = s.replace('R$', '').replace('$', '').replace(' ', '')
         has_dot = '.' in s
         has_comma = ',' in s
         if has_dot and has_comma:

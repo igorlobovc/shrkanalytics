@@ -33,7 +33,7 @@ def parse_currency_robust(value: str) -> float:
     s = str(value or '').strip()
     if not s:
         return 0.0
-    s = s.replace('R$', '').replace(' ', '')
+    s = s.replace('R$', '').replace('$', '').replace(' ', '')
     has_dot = '.' in s
     has_comma = ',' in s
     if has_dot and has_comma:

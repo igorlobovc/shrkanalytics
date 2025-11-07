@@ -14,6 +14,7 @@ import csv
 import re
 import zipfile
 from xml.etree import ElementTree as ET
+import pandas as pd
 
 PROC = Path('Estelita/Processed')
 FORN_ROOT = Path('/Users/igorcunha/SHRKVSCODE/Estelita/Raw/Fornecedores')
@@ -63,7 +64,8 @@ def parse_currency_robust(value: str) -> float:
     s = str(value or '').strip()
     if not s:
         return 0.0
-    s = s.replace('R$', '').replace(' ', '')
+    # strip currency symbols
+    s = s.replace('R$', '').replace('$', '').replace(' ', '')
     has_dot = '.' in s
     has_comma = ',' in s
     if has_dot and has_comma:
@@ -137,6 +139,115 @@ def read_sheet_rows(z: zipfile.ZipFile, sheet_path: str, sst: list[list[str]]):
         data.append(values)
     return header_list, data
 
+
+def find_col(df: 'pd.DataFrame', candidates: list[str]) -> str | None:
+    cols = list(df.columns)
+    cn = [str(c).strip().lower() for c in cols]
+    for opt in candidates:
+        optn = opt.strip().lower()
+        for i, x in enumerate(cn):
+            if optn == x:
+                return cols[i]
+        for i, x in enumerate(cn):
+            if optn in x:
+                return cols[i]
+    return None
+
+
+def to_cents_series(series: 'pd.Series') -> 'pd.Series':
+    def parse(v):
+        s = str(v or '').strip()
+        if not s:
+            return 0
+        s = s.replace('R$','').replace('$','')
+        s = s.replace(' ', '')
+        has_dot = '.' in s
+        has_comma = ',' in s
+        if has_dot and has_comma:
+            last_sep = s[max(s.rfind('.'), s.rfind(','))]
+            if last_sep == ',':
+                s = s.replace('.', '')
+                s = s.replace(',', '.')
+            else:
+                s = s.replace(',', '')
+        elif has_comma and not has_dot:
+            if re.search(r",\d{2}$", s):
+                s = s.replace(',', '.')
+            else:
+                s = s.replace(',', '')
+        elif has_dot and not has_comma:
+            if not re.search(r"\.\d{2}$", s):
+                s = s.replace('.', '')
+        try:
+            return int(round(float(s)*100))
+        except Exception:
+            return 0
+    return series.map(parse)
+
+
+def classify_values_from_workbook(xlsx: Path, provider: str):
+    explicit_out = []
+    alias_out = []
+    try:
+        xl = pd.ExcelFile(xlsx)
+    except Exception:
+        return explicit_out, alias_out
+    for sheet in xl.sheet_names:
+        try:
+            df = xl.parse(sheet)
+        except Exception:
+            continue
+        if df is None or df.empty:
+            continue
+        # Identify columns
+        col_unc = find_col(df, ['Uncertain Match','uncertain_match'])
+        col_basis = find_col(df, ['Eligibility Basis','eligibility basis'])
+        col_amt = find_col(df, ['Valor (BRL)','VALOR A PAGAR - EDITORA'])
+        if col_amt is None:
+            continue
+        # Build amount_cents
+        if str(col_amt).strip().lower() == 'valor (brl)':
+            cents = (pd.to_numeric(df[col_amt], errors='coerce').fillna(0.0)*100).round().astype(int)
+        else:
+            cents = to_cents_series(df[col_amt])
+        # Determine uncertainty
+        if col_unc and col_unc in df.columns:
+            unc = df[col_unc].astype(str).str.strip().str.lower().map(lambda x: True if x=='true' else (False if x=='false' else True))
+        else:
+            if col_basis and col_basis in df.columns:
+                unc = df[col_basis].astype(str).str.contains('artist_alias|editora_alias', case=False, na=False)
+            else:
+                unc = pd.Series([True]*len(df))
+        # Select useful columns
+        keep_cols = [c for c in ['EDITORA','PROGRAMA','NÚMERO PROGRAMA','EXIBIÇÃO (GRAVADO OU REPRISE)','CATEGORIA DO PROGRAMA (PROGRAMA, NOVELA)','DATA DE EXIBIÇÃO','NOME DA MÚSICA','AUTOR','INTERPRETE','PERCENTUAL A PAGAR - EDITORA',col_amt] if c in df.columns]
+        sub = df[keep_cols].copy()
+        sub.insert(0, 'file_stem', xlsx.stem.replace('__eligible_with_refs',''))
+        sub.insert(0, 'provider', provider)
+        sub['amount_cents'] = cents
+        # explicit: uncertain == False
+        e = sub[(sub['amount_cents']>0) & (~unc)]
+        a = sub[(sub['amount_cents']>0) & (unc)]
+        if not e.empty:
+            explicit_out.append(e)
+        if not a.empty:
+            alias_out.append(a)
+    return explicit_out, alias_out
+
+
+def write_values_csv(path: Path, frames: list['pd.DataFrame']):
+    if not frames:
+        if path.exists():
+            try:
+                path.unlink()
+            except Exception:
+                pass
+        return
+    df = pd.concat(frames, ignore_index=True)
+    if 'amount_cents' in df.columns:
+        df['amount_numeric'] = (df['amount_cents'].astype(int)/100.0).map(lambda v: f"{v:.2f}")
+    cols = ['provider','file_stem'] + [c for c in df.columns if c not in {'provider','file_stem'}]
+    df[cols].to_csv(path, index=False)
+
 def build_stem_provider_map():
     stem_to_provider = {}
     for p in FORN_ROOT.rglob('*'):
@@ -203,67 +314,18 @@ def write_alias_values_csv(alias_rows):
 
 def main():
     stem_to_provider = build_stem_provider_map()
-
-    # Explicit values (fast path from consolidated explicit CSV)
-    explicit_in = PROC / 'Eligible_Explicit_All_Providers.csv'
-    explicit_out = PROC / 'Eligible_Value_Explicit_All_Providers.csv'
-    if explicit_in.exists():
-        try:
-            with open(explicit_in, 'r', encoding='utf-8', newline='') as inf:
-                rin = csv.DictReader(inf)
-                rows = []
-                cols = rin.fieldnames or []
-                for row in rin:
-                    amt = parse_currency_robust(row.get('VALOR A PAGAR - EDITORA',''))
-                    if amt > 0:
-                        rows.append((row, amt))
-            if rows:
-                with open(explicit_out, 'w', encoding='utf-8', newline='') as outf:
-                    # Keep a useful subset + numeric amount; avoid duplicates
-                    base_keep = ['provider','file_stem']
-                    rest = [c for c in cols if c not in {'__title_norm','__author_norm','__is_match','__sheet'} and c not in base_keep]
-                    keep = base_keep + rest
-                    w = csv.DictWriter(outf, fieldnames=keep + ['amount_numeric','amount_cents'])
-                    w.writeheader()
-                    for row, amt in rows:
-                        out = {k: row.get(k, '') for k in keep}
-                        out['amount_numeric'] = f"{amt:.2f}"
-                        out['amount_cents'] = str(int(round(amt*100)))
-                        w.writerow(out)
-        except Exception:
-            pass
-
-    # Alias values
-    # Normalize/ensure alias values include integer cents
-    alias_in = PROC / 'Eligible_Value_Alias_All_Providers.csv'
-    if alias_in.exists():
-        try:
-            with open(alias_in, 'r', encoding='utf-8', newline='') as inf:
-                rin = csv.DictReader(inf)
-                data = [row for row in rin]
-            if data:
-                # Re-write file with amount_cents added
-                fieldnames = list(data[0].keys())
-                if 'amount_cents' not in fieldnames:
-                    fieldnames = fieldnames + ['amount_cents']
-                with open(alias_in, 'w', encoding='utf-8', newline='') as outf:
-                    w = csv.DictWriter(outf, fieldnames=fieldnames)
-                    w.writeheader()
-                    for row in data:
-                        v = row.get('Valor (BRL)') or row.get('amount_numeric') or '0'
-                        try:
-                            amt = float(v)
-                        except Exception:
-                            amt = 0.0
-                        row['amount_cents'] = str(int(round(amt*100)))
-                        w.writerow(row)
-        except Exception:
-            pass
-    else:
-        # Derive alias from xlsx if not present
-        alias_rows: list[list[str]] = []
-        write_alias_values_from_xlsx(stem_to_provider, alias_rows)
-        write_alias_values_csv(alias_rows)
+    exp_frames = []
+    ali_frames = []
+    for xlsx in PROC.glob('*__eligible_with_refs.xlsx'):
+        stem = xlsx.stem.replace('__eligible_with_refs', '')
+        provider = stem_to_provider.get(stem, '')
+        e, a = classify_values_from_workbook(xlsx, provider)
+        if e:
+            exp_frames.extend(e)
+        if a:
+            ali_frames.extend(a)
+    write_values_csv(PROC / 'Eligible_Value_Explicit_All_Providers.csv', exp_frames)
+    write_values_csv(PROC / 'Eligible_Value_Alias_All_Providers.csv', ali_frames)
 
 if __name__ == '__main__':
     main()

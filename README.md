@@ -144,7 +144,14 @@ Outputs:
 - `Estelita/Processed/Summaries/Providers_Explicit_Alias_Summary.csv`
   - Columns: provider, explicit_rows_total, explicit_with_rows, explicit_value_brl_int,
              alias_rows_total, alias_with_rows, alias_value_brl_int
-  - Built from the four sheet-based rollups (with/without value) to give a single view per provider.
+- Built from the four sheet-based rollups (with/without value) to give a single view per provider.
+
+### Definitive Explicit Matches (All Suppliers)
+
+- `Estelita/Processed/Summaries/Explicit_Matches_All.csv`
+  - A fully-vetted list of explicit matches (all rows from `Explicit_Refs_Only` across every processed eligible workbook)
+  - Columns include provider, file_stem, source_sheet, programa, data_exibicao, titulo_musica, autor, interprete,
+    matched_title, matched_identifier_iswc, eligibility_basis, amount_cents, amount_int, valor_editora_brl
 
 ## 🚀 Running the Full Pipeline
 

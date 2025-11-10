@@ -1,0 +1,178 @@
+file,category,score,last_commit_date
+README.md,Docs: project README,100,2025-11-07 20:01:59 -0300
+Estelita/build_explicit_counts_by_sheet.py,Core code script,95,2025-11-07 20:01:59 -0300
+Estelita/build_definitive_explicit_csv.py,Core code script,95,2025-11-07 19:40:52 -0300
+Estelita/build_explicit_terms_index.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/build_files_summary.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/build_unified_summaries.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/build_value_rollups.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/export_sbt_rights_eligible.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/run_full_pipeline.py,Core code script,95,2025-11-07 19:30:03 -0300
+Estelita/normalize_fornecedores.py,Core code script,95,2025-11-07 18:51:32 -0300
+Estelita/build_providers_summary.py,Core code script,95,2025-11-07 18:38:34 -0300
+Estelita/audit_search_coverage.py,Core code script,95,2025-11-07 18:23:21 -0300
+Estelita/build_searchable_base.py,Core code script,95,2025-11-07 18:23:21 -0300
+Estelita/build_fornecedores_summaries.py,Core code script,95,2025-11-07 16:46:56 -0300
+Estelita/build_finance_pack.py,Core code script,95,2025-11-07 16:35:15 -0300
+Estelita/print_explicit_metrics.py,Core code script,95,2025-11-07 16:35:15 -0300
+Estelita/export_matches_from_supplier_file.py,Core code script,95,2025-11-07 13:21:50 -0300
+Estelita/build_eligible_catalog.py,Core code script,95,2025-11-07 11:42:16 -0300
+Estelita/analyze_supplier_readiness.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/batch_match_suppliers.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/build_relations_duckdb.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/coverage_report.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/estelita_consolidator.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/prepare_titles_and_match_suppliers.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/run_match.py,Core code script,95,2025-11-07 10:31:27 -0300
+Estelita/GPT Correction executor.py,Core code script,95,2025-11-06 16:47:13 -0300
+Estelita/GPT correction excutor 2.py,Core code script,95,2025-11-06 16:47:13 -0300
+Estelita/match_estelita_data.py,Core code script,95,2025-11-06 16:47:13 -0300
+Estelita/script ingest_fornecedores.py,Core code script,95,2025-11-06 16:47:13 -0300
+Estelita/Raw/Unified/CanalBrasil unificado Jan fev mar24 dez 2023.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/Clipes Unificados_nov Dez 2023.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/Globo MusicCueSheet meses 08 10 11 de 2023 e 01 de 2024.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/Globo Unificado nov dez2023.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/SBT Unificado  nov dez 23 e jan fev mar 24.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/Tv Aparecida Unificado  Dez 2023 jan mar 2024.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Raw/Unified/band UNIFICADO out dez 2023 jan fev 2024.xlsx,Tracked unified input,85,2025-11-07 17:14:14 -0300
+Estelita/Processed/Summaries/Explicit_Matches_All.csv,Generated summary (useful),80,2025-11-07 20:01:59 -0300
+Estelita/Processed/Summaries/Fornecedores_ByProvider_Summary.csv,Generated summary (useful),80,2025-11-07 20:01:59 -0300
+Estelita/Processed/Summaries/Fornecedores_Summary.csv,Generated summary (useful),80,2025-11-07 20:01:59 -0300
+Estelita/Processed/Summaries/Unified_Explicit_Summary.csv,Generated summary (useful),80,2025-11-07 20:01:59 -0300
+Estelita/Processed/Summaries/Explicit_Matches_Exact.csv,Generated summary (useful),80,2025-11-07 19:40:52 -0300
+Estelita/Processed/Summaries/Explicit_Terms_Index.csv,Generated summary (useful),80,2025-11-07 19:30:03 -0300
+Estelita/Processed/Summaries/Files_Explicit_Alias_Summary.csv,Generated summary (useful),80,2025-11-07 19:30:03 -0300
+Estelita/Processed/Summaries/Providers_Explicit_Alias_Summary.csv,Generated summary (useful),80,2025-11-07 19:30:03 -0300
+Estelita/Processed/Summaries/Band_Explicit_With_Value.csv,Generated summary (useful),80,2025-11-07 18:12:24 -0300
+Estelita/Processed/Summaries/SBT_Rights_Eligible_Summary.csv,Generated summary (useful),80,2025-11-07 15:54:59 -0300
+Estelita/Processed/Normalized/_summary.csv,Normalized summary index,75,2025-11-07 18:51:32 -0300
+Estelita/GPT JSON INSTRUCTORS/1 estelita_project_state.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/GPT JSON INSTRUCTORS/2 estelita_process_history.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/GPT JSON INSTRUCTORS/3 estelita_matching_strategy.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/GPT JSON INSTRUCTORS/4 estelita_next_actions.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/GPT JSON INSTRUCTORS/5 estelita_environment_setup.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/GPT JSON INSTRUCTORS/consolidated_reference_instructions.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/Project_instructionsGPT.json,Config/docs,60,2025-11-06 16:47:13 -0300
+Estelita/Processed/CanalBrasil unificado Jan fev mar24 dez 2023__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Clipes Unificados_nov Dez 2023__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Fornecedores_Amounts_Presence.csv,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Fornecedores_ByProvider_Summary.csv,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Fornecedores_Summary.csv,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Globo MusicCueSheet meses 08 10 11 de 2023 e 01 de 2024__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Globo Unificado nov dez2023__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Agosto2023__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Outubro2023__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/SBT Unificado  nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Tv Aparecida Unificado  Dez 2023 jan mar 2024__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/band UNIFICADO out dez 2023 jan fev 2024__eligible_with_refs.xlsx,Generated artifact,50,2025-11-07 20:01:59 -0300
+Estelita/Processed/Alias_Without_Value_All_Providers.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/CanalBrasil unificado Jan fev mar24 dez 2023__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/CanalBrasil unificado Jan fev mar24 dez 2023__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Clipes Unificados_nov Dez 2023__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Clipes Unificados_nov Dez 2023__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Eligible_Value_Alias_All_Providers.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Eligible_Value_Explicit_All_Providers.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Explicit_Without_Value_All_Providers.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Fornecedores_Run_Summary.tsv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Globo MusicCueSheet meses 08 10 11 de 2023 e 01 de 2024__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Globo MusicCueSheet meses 08 10 11 de 2023 e 01 de 2024__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Globo Unificado nov dez2023__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Globo Unificado nov dez2023__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Agosto2023__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Agosto2023__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Outubro2023__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Outubro2023__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/SBT Unificado  nov dez 23 e jan fev mar 24__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/SBT Unificado  nov dez 23 e jan fev mar 24__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/SBT_Rights_Eligible_Summary.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Supplier_Matches_All.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Suppliers_Coverage_Summary.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Suppliers_Top_Unmatched.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Tv Aparecida Unificado  Dez 2023 jan mar 2024__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Tv Aparecida Unificado  Dez 2023 jan mar 2024__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/_matches_fornecedores.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/_matches_unified.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/band UNIFICADO out dez 2023 jan fev 2024__eligible_alias.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/band UNIFICADO out dez 2023 jan fev 2024__eligible_explicit.csv,Generated artifact,50,2025-11-07 19:30:03 -0300
+Estelita/Processed/Searchable_Base.csv,Generated artifact,50,2025-11-07 18:23:21 -0300
+Estelita/Processed/Supplier_Search_Coverage.csv,Generated artifact,50,2025-11-07 18:23:21 -0300
+Estelita/Processed/Eligible_Explicit_All_Providers.csv,Generated artifact,50,2025-11-07 15:16:48 -0300
+Estelita/Processed/01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Agosto2023__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Agosto2023__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Outubro2023__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/MusicCueSheet_TvAberta_Outubro2023__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Relatorio_CanalBrasil_Jan24__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Relatorio_CanalBrasil_Jan24__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Ubem_CanalBrasil_Fev24 (1)__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Ubem_CanalBrasil_Fev24 (1)__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/band UNIFICADO out dez 2023 jan fev 2024__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/band UNIFICADO out dez 2023 jan fev 2024__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 15:04:47 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 14:51:50 -0300
+Estelita/Processed/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 14:51:50 -0300
+Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.csv,Generated artifact,50,2025-11-07 13:21:50 -0300
+Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx,Generated artifact,50,2025-11-07 13:21:50 -0300
+Estelita/Processed/Eligible_Artists.txt,Generated artifact,50,2025-11-07 11:42:16 -0300
+Estelita/Processed/Eligible_Catalog.csv,Generated artifact,50,2025-11-07 11:42:16 -0300
+Estelita/Processed/Curated_Titles_Authors.csv,Generated artifact,50,2025-11-07 10:31:27 -0300
+Estelita/Processed/Supplier_Matches.csv,Generated artifact,50,2025-11-07 10:31:27 -0300
+Estelita/Processed/Suppliers_Readiness_Report.csv,Generated artifact,50,2025-11-07 10:31:27 -0300
+Estelita/Processed/Suppliers_Readiness_Top.csv,Generated artifact,50,2025-11-07 10:31:27 -0300
+Estelita/Processed/cleaning_report.csv,Generated artifact,50,2025-11-06 16:47:13 -0300
+Estelita/Processed/Normalized/_missing_sheets.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 20:01:59 -0300
+Estelita/Processed/Normalized/01-JAN2024-SINCRONIZACAO MUSICAL-TV APARECIDA__Sincroniza_o_Musical__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/03-MAR2024-SINCRONIZACAO MUSICAL-TV APARECIDA__Sincroniza_o_Musical__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/12-DEZ2023-SINCRONIZACAO MUSICAL-TV APARECIDA__Sincroniza_o_Musical__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalBrasil_Dezembro2023__CanalBrasil_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalBrasil_Novembro2023__CanalBrasil_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalInternacional_Dezembro2023__CanalInternacional_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalInternacional_Novembro2023__CanalInternacional_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalViva_Dezembro2023__CanalViva_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/CanalViva_Novembro2023__CanalViva_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/ConsolidadoClipes_Dezembro2023__ConsolidadoClipes_Dez23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/ConsolidadoClipes_Novembro__ConsolidadoClipes_Nov2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/ConsolidadoDiversos_Dezembro2023__ConsolidadoDiversos_Dezembro23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/ConsolidadoDiversos_Novembro2023__TvFechada_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Globonews_Dezembro2023__Globonews_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Globonews_Novembro2023__Globonews_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Globoplay_NovelasDeAcervo_Dezembro2023__NovelasAcervo_Globoplay_Dez23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/MusicCueSheet_OriginaisGloboplay_Outubro2023__MusicCueSheet_Globoplay_Out2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/MusicCueSheet_TvAberta_Agosto2023__MusicCueSheet_Agosto23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/MusicCueSheet_TvAberta_Outubro2023__MusicCueSheet_TvAberta_Out23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/NovelasAcervo_Novembro2023__Globoplay_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Relatorio_CanaisGlobo__Jan24__CanaisGlobo_Janeiro24__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Relatorio_CanalBrasil_Jan24__CanalBrasil_Janeiro24__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Relatorio_Globoplay_Jan24__Globoplay_Janeiro24__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Relatorio_UBEM band out2023__Relatorio_UBEM__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Sportv_Dezembro2023__Sportv_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Sportv_Novembro2023__Sportv_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/TvAberta_Dezembro2023__TvAberta_Dezembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/TvAberta_Novembro2023__TvAberta_Novembro2023__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Ubem Shark__Controle__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Ubem Shark__P_gina1__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Ubem_CanalBrasil_Fev24 (1)__CanalBrasil_Fevereiro24__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Ubem_MusicCueSheet_OriginaisGloboplay_Janeiro24__MusicCueSheet_Globoplay_Jan24__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Ubem_MusicCueSheet_OriginaisGloboplay_Novembro23__MusicCueSheet_Globoplay_Nov23__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/Unificado SBT nov dez 23 e jan fev mar 24__Relat_rio_Solicita_o__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/Normalized/band UNIFICADO out dez 2023 jan fev 2024__Relatorio_UBEM__normalized.csv,Generated normalized per-sheet CSV (bulky),40,2025-11-07 19:30:03 -0300
+Estelita/Processed/_logs/Searchable_Stats.json,Log artifact,35,2025-11-07 18:23:21 -0300
+Estelita/Processed/_logs/Eligible_Catalog.summary.json,Log artifact,35,2025-11-07 11:42:16 -0300
+Estelita/Processed/_logs/Curated_Analysis.json,Log artifact,35,2025-11-07 10:31:27 -0300
+.gitignore,Other,30,2025-11-07 17:14:14 -0300
+Estelita/maintenance.sh,Other,30,2025-11-06 16:47:13 -0300

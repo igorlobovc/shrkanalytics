@@ -7,6 +7,8 @@ __pycache__/
 *.xlsb
 # Allow committing Unified raw workbooks
 !Estelita/Raw/Unified/*.xlsx
+# Ignore bulky per-sheet normalized CSVs (keep summary index)
+Estelita/Processed/Normalized/*__normalized.csv
 # Allow committing the prioritized SBT matches workbook
 !Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__matches_only_with_refs.xlsx
 !Estelita/Processed/Unificado SBT nov dez 23 e jan fev mar 24__eligible_with_refs.xlsx

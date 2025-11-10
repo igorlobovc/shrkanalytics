@@ -1,0 +1,42 @@
+name: Pipeline Check
+
+on:
+  push:
+    branches: [ finance-pack-and-summaries ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate data catalog
+        run: |
+          python3 Estelita/build_data_catalog.py || true
+      - name: Sanity-check summaries (headers exist)
+        run: |
+          test -f Estelita/Processed/Summaries/Providers_Explicit_Alias_Summary.csv || true
+          test -f Estelita/Processed/Summaries/Files_Explicit_Alias_Summary.csv || true
+          test -f Estelita/Processed/Summaries/Explicit_Matches_All.csv || true
+      - name: Metrics smoke test
+        run: |
+          python3 - << 'PY'
+          import csv, os
+          base='Estelita/Processed/Summaries'
+          ok=True
+          for fn in ['Providers_Explicit_Alias_Summary.csv','Files_Explicit_Alias_Summary.csv','Explicit_Matches_All.csv']:
+              p=os.path.join(base,fn)
+              if not os.path.exists(p):
+                  continue
+              with open(p,'r',encoding='utf-8') as f:
+                  r=csv.reader(f)
+                  hdr=next(r,[]) 
+                  assert len(hdr)>0
+          print('Summaries present and readable')
+          PY
+

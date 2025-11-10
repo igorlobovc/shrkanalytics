@@ -266,6 +266,15 @@ def main():
         })
 
     df = pd.DataFrame(rows)
+    # Optional stem/provider normalization via config (if provided)
+    try:
+        cfg = pd.read_csv('Estelita/config/stem_aliases.csv')
+        if not cfg.empty and {'file_stem','provider'}.issubset(cfg.columns):
+            # Use mapping to override or normalize stems/providers
+            m = {(str(r['file_stem']).strip()): str(r['provider']).strip() for _, r in cfg.iterrows()}
+            df['provider'] = df.apply(lambda r: m.get(str(r['file_stem']).strip(), r['provider']), axis=1)
+    except Exception:
+        pass
     df = df.sort_values(['provider', 'file_stem']).reset_index(drop=True)
     out_general = PROC / 'Fornecedores_Summary.csv'
     df.to_csv(out_general, index=False)

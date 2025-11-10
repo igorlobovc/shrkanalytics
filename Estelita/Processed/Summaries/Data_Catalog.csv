@@ -1,0 +1,13 @@
+file,rows,columns,purpose
+Band_Explicit_With_Value.csv,8,"provider;file_stem;PROGRAMA;Exibição;Música;Autor;Intérprete;Tipo;Sincronização;VOD;Total;amount_int;amount_cents;amount_numeric;EDITORA;NÚMERO PROGRAMA;EXIBIÇÃO (GRAVADO OU REPRISE);CATEGORIA DO PROGRAMA (PROGRAMA, NOVELA);DATA DE EXIBIÇÃO;NOME DA MÚSICA;AUTOR;INTERPRETE;PERCENTUAL A PAGAR - EDITORA;VALOR A PAGAR - EDITORA",Generated summary
+Explicit_Matches_All.csv,60,provider;file_stem;source_sheet;programa;data_exibicao;numero_programa;titulo_musica;autor;interprete;matched_title;matched_identifier_iswc;eligibility_basis;uncertain_match;amount_cents;amount_int;valor_editora_brl,All explicit rows from Explicit_Refs_Only across suppliers
+Explicit_Matches_Exact.csv,57,provider;file_stem;source_sheet;programa;data_exibicao;numero_programa;titulo_musica;autor;interprete;matched_title;matched_identifier_iswc;eligibility_basis;uncertain_match;amount_cents;amount_int;valor_editora_brl,Strict subset of explicit rows: exact (uncertain=false or ISWC/basis)
+Explicit_Terms_Index.csv,38,source_sheet;term;term_type,3-col index of terms (music/author/ISRC) from explicit rows
+Files_Explicit_Alias_Summary.csv,12,provider;file_stem;explicit_rows_total;explicit_with_rows;explicit_value_brl_int;alias_rows_total;alias_with_rows;alias_value_brl_int,Per-file explicit/alias counts and integer BRL
+Fornecedores_ByProvider_Summary.csv,12,provider;files;matches_rows;eligible_explicit_rows;eligible_alias_rows;sum_valor_brl_explicit,Generated summary
+Fornecedores_Summary.csv,18,provider;file_stem;matches_rows;eligible_explicit_rows;eligible_alias_rows;sum_valor_brl_explicit,Generated summary
+Providers_Explicit_Alias_Summary.csv,9,provider;explicit_rows_total;explicit_with_rows;explicit_value_brl_int;alias_rows_total;alias_with_rows;alias_value_brl_int,Provider totals of explicit/alias rows and integer BRL
+SBT_Rights_Eligible_Summary.csv,1,file;eligible_rows_total;explicit_rows;alias_only_rows;sum_valor_editora_brl,Generated summary
+Unified_Explicit_Summary.csv,7,file_stem;explicit_rows;explicit_with_value_rows;unified_lastcol_amount_rows,Per unified workbook: explicit counts and last-column amount rows
+files_by_recency.csv,177,file;last_commit_date;last_commit_sha;last_message,All tracked files with last commit metadata (newest->oldest)
+files_usefulness_rank.csv,177,file;category;score;last_commit_date,Files ranked by usefulness category and score

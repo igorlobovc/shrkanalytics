@@ -292,6 +292,9 @@ def main():
         s = str(value or '').strip()
         if not s:
             return 0.0
+        lower = s.lower()
+        if lower in {'nan', 'none', 'null'}:
+            return 0.0
         # Strip common currency symbols and spaces
         s = s.replace('R$', '').replace('$', '').replace(' ', '')
         has_dot = '.' in s
@@ -322,7 +325,11 @@ def main():
             amt = next((c for c in df.columns if str(c).strip().lower() == 'total'), None)
         if amt:
             df['Valor (BRL)'] = df[amt].apply(parse_currency_robust)
-            df['Valor (BRL, sem centavos)'] = df['Valor (BRL)'].apply(lambda v: int(v))
+            df['Valor (BRL, sem centavos)'] = (
+                df['Valor (BRL)']
+                .fillna(0)
+                .apply(lambda v: int(float(v) if v is not None else 0))
+            )
         return df
 
     explicit = add_amount_columns(explicit)
